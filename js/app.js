@@ -804,7 +804,7 @@
   function applyTheme() {
     var st = document.documentElement.style, t = S.theme, b = BGS[t.bg] || BGS.escuro;
     st.setProperty('--acc', t.acc); st.setProperty('--on', hexLum(t.acc) > 0.6 ? '#111' : '#fff');
-    st.setProperty('--bg', b[0]); st.setProperty('--card', b[1]); st.setProperty('--card2', b[2]); st.setProperty('--line', b[3]); st.setProperty('--dockbg', b[0]);
+    st.setProperty('--bg', b[0]); st.setProperty('--card', b[1]); st.setProperty('--card2', b[2]); st.setProperty('--line', 'color-mix(in srgb, ' + t.acc + ' 55%, ' + b[3] + ')'); st.setProperty('--dockbg', b[0]);
     var el = $('#brandLogo'), br = S.brand, h = '';
     if (br.img) h = '<img src="' + br.img + '" alt="">';
     else if (br.id) { var bb = BRANDS.filter(function (x) { return x[0] === br.id; })[0]; if (bb) h = '<span class="bmk l' + Math.min(bb[2].length, 4) + '">' + esc(bb[2]) + '</span>'; }
@@ -847,7 +847,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 18;
+  var APP_V = 19;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
