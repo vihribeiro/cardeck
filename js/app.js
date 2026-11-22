@@ -667,12 +667,12 @@
 
   /* ---------- busca + player via Piped (teste: sem anuncios, sem login Google) ---------- */
   var PIPED = [['https://api.piped.private.coffee', 'https://piped.private.coffee'], ['https://pipedapi.kavin.rocks', 'https://piped.video']];
-  function pdFetch(path) {
+  function pdFetch(path, ms) {
     var i = 0, order = PIPED.map(function (p, k) { return k; });
     if (S.pdBest) order.sort(function (a, b) { return (b === S.pdBest.i) - (a === S.pdBest.i); });
     function next() {
       if (i >= order.length) return Promise.reject(new Error('nenhum servidor respondeu'));
-      var k = order[i++], ctl = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 9000);
+      var k = order[i++], ctl = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, ms || 9000);
       return fetch(PIPED[k][0] + path, ctl ? { signal: ctl.signal } : {}).then(function (r) { clearTimeout(tm); if (!r.ok) throw 0; return r.json(); })
         .then(function (j) { if (j && j.error) throw 0; S.pdBest = { i: k }; return { j: j, k: k }; })
         .catch(function () { clearTimeout(tm); return next(); });
@@ -682,13 +682,17 @@
   function pdSearch(q) {
     q = q.trim(); if (!q) return;
     $('#pdStatus').textContent = 'Buscando…'; $('#pdRes').innerHTML = '';
-    pdFetch('/search?q=' + encodeURIComponent(q) + '&filter=videos').then(function (o) {
+    var live = S.pdLive;
+    pdFetch('/search?q=' + encodeURIComponent(live ? q + ' live' : q) + '&filter=videos').then(function (o) {
       var items = (o.j.items || []).filter(function (x) { return x.type === 'stream' && /v=([\w-]{11})/.test(x.url); });
-      $('#pdStatus').textContent = items.length ? '' : 'Nada encontrado.';
+      var isLive = function (x) { return !(x.duration > 0); };
+      if (live) items = items.filter(isLive);
+      else items = items.filter(isLive).concat(items.filter(function (x) { return !isLive(x); }));
+      $('#pdStatus').textContent = items.length ? '' : (live ? 'Nenhuma transmissão ao vivo encontrada para essa busca.' : 'Nada encontrado.');
       items.forEach(function (x) {
         var id = x.url.match(/v=([\w-]{11})/)[1], el = document.createElement('div'); el.className = 'item';
         var d = x.duration > 0 ? Math.floor(x.duration / 60) + ':' + ('0' + (x.duration % 60)).slice(-2) : 'AO VIVO';
-        el.innerHTML = '<img style="width:96px;height:54px" src="https://i.ytimg.com/vi/' + id + '/mqdefault.jpg"><div class="t"><b>' + esc(x.title) + '</b><span>' + esc((x.uploaderName || '') + ' · ' + d) + '</span></div>';
+        el.innerHTML = '<img style="width:96px;height:54px" src="https://i.ytimg.com/vi/' + id + '/mqdefault.jpg"><div class="t"><b>' + esc(x.title) + '</b><span>' + esc(x.uploaderName || '') + ' · ' + (isLive(x) ? '<em style="color:#ff4d4d;font-style:normal;font-weight:600">● AO VIVO</em>' : d) + '</span></div>';
         el.onclick = function () { $$('#pdRes .item').forEach(function (e) { e.classList.remove('playing'); }); el.classList.add('playing'); pdPlay(id, o.k); };
         $('#pdRes').appendChild(el);
       });
@@ -697,10 +701,12 @@
   function pdPlay(id, k) {
     var box = $('#pdPlayer'); box.innerHTML = '<div class="muted small">Carregando vídeo…</div>';
     var frame = function (why) {
-      box.innerHTML = '<div class="player"><iframe src="' + PIPED[k][1] + '/embed/' + id + '?autoplay=1" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>';
-      $('#pdStatus').textContent = 'Player alternativo (' + why + ').';
+      box.innerHTML = embedHtml(id) + '<div class="row"><a class="btn" href="https://www.youtube.com/watch?v=' + id + '" target="_blank" rel="noopener">Abrir no YouTube</a></div>';
+      mountApi(box);
+      $('#pdStatus').textContent = 'Tocando pelo player do YouTube (pode ter anúncios): o servidor sem anúncios não conseguiu este vídeo.';
     };
-    pdFetch('/streams/' + id).then(function (o) {
+    $('#pdStatus').textContent = '';
+    pdFetch('/streams/' + id, 5000).then(function (o) {
       var vs = (o.j.videoStreams || []).filter(function (v) { return !v.videoOnly && /MPEG_4|MP4/i.test(v.format) && !/HLS/i.test(v.format); });
       vs.sort(function (a, b) { return (b.height || parseInt(b.quality) || 0) - (a.height || parseInt(a.quality) || 0); });
       var u = o.j.hls || (vs[0] && vs[0].url);
@@ -710,6 +716,13 @@
       var pr = v.play && v.play(); if (pr && pr.catch) pr.catch(function () {});
     }).catch(function () { frame('servidor sem resposta'); });
   }
+  $('#pdFilter').onclick = function (e) {
+    var c = e.target.closest ? e.target.closest('.chip') : null; if (!c) return;
+    S.pdLive = c.dataset.f === 'live'; save();
+    $$('#pdFilter .chip').forEach(function (x) { x.classList.toggle('on', x === c); });
+    if ($('#pdQ').value.trim()) pdSearch($('#pdQ').value);
+  };
+  $$('#pdFilter .chip').forEach(function (x) { x.classList.toggle('on', (x.dataset.f === 'live') === !!S.pdLive); });
   $('#pdGo').onclick = function () { pdSearch($('#pdQ').value); };
   $('#pdQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') pdSearch(this.value); });
 
@@ -922,7 +935,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 26;
+  var APP_V = 27;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];

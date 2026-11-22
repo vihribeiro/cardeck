@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=26">
+<link rel="stylesheet" href="css/app.css?v=27">
 </head>
 <body>
 <div id="app">
@@ -126,6 +126,7 @@
           <input id="pdQ" type="search" placeholder="Pesquisar no YouTube" autocomplete="off" autocorrect="off">
           <button id="pdGo" class="btn primary">Buscar</button>
         </div>
+        <div class="chips" id="pdFilter" style="margin:8px 0"><span class="chip on" data-f="all">Tudo</span><span class="chip" data-f="live">Ao vivo</span></div>
         <div id="pdPlayer"></div>
         <div id="pdStatus" class="muted small"></div>
         <div id="pdRes" class="list" style="margin-top:8px"></div>
@@ -258,10 +259,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v26</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v27</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=26"></script>
+<script src="js/app.js?v=27"></script>
 </body>
 </html>
