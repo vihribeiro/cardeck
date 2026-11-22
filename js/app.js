@@ -512,7 +512,10 @@
 
   /* ---------- música: rádios + player ---------- */
   var audio = $('#audio'), radios = [], radioMode = 'top', playingId = null, radioLoaded = false;
-  var RCHIPS = [['top', 'Populares'], ['rock', 'Rock'], ['pop', 'Pop'], ['sertanejo', 'Sertanejo'], ['jazz', 'Jazz'], ['news', 'Notícias']];
+  var RCHIPS = [['top', 'Populares'], ['rock', 'Rock'], ['pop', 'Pop'], ['sertanejo', 'Sertanejo'], ['jazz', 'Jazz'], ['news', 'Notícias'], ['q:cultura', 'Cultura']];
+  function radioSearch() { var q = $('#radioQ').value.trim(); if (!q) return; radioMode = 'q:' + q; radioLoaded = false; loadRadios(); }
+  $('#radioGo').onclick = radioSearch;
+  $('#radioQ').onkeydown = function (e) { if (e.key === 'Enter') radioSearch(); };
   function loadRadios() {
     var chips = $('#radioChips'); chips.innerHTML = '';
     RCHIPS.forEach(function (c) {
@@ -522,10 +525,11 @@
     if (radioLoaded) return;
     var box = $('#radioList'); box.innerHTML = '<div class="muted">Carregando…</div>';
     var u = 'https://de1.api.radio-browser.info/json/stations/search?countrycode=BR&hidebroken=true&order=clickcount&reverse=true&limit=40' +
-      (radioMode !== 'top' ? '&tag=' + encodeURIComponent(radioMode) : '');
+      (radioMode === 'top' ? '' : radioMode.indexOf('q:') === 0 ? '&name=' + encodeURIComponent(radioMode.slice(2)) : '&tag=' + encodeURIComponent(radioMode));
     getJSON(u).then(function (list) {
       radios = list.filter(function (s) { return s.url_resolved && /^https:/.test(s.url_resolved); });
       radioLoaded = true; renderRadios();
+      if (!radios.length) box.innerHTML = '<div class="muted">Nenhuma rádio encontrada.</div>';
     }).catch(function () { box.innerHTML = '<div class="muted">Não foi possível carregar as rádios.</div>'; });
   }
   function renderRadios() {

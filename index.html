@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=8">
+<link rel="stylesheet" href="css/app.css?v=9">
 </head>
 <body>
 <div id="app">
@@ -110,6 +110,7 @@
         <a class="chip" href="deezer://">Deezer</a>
       </div>
       <h3>Rádios</h3>
+      <div class="searchbar"><input id="radioQ" placeholder="Buscar rádio (ex.: Cultura, Jovem Pan, CBN)"><button id="radioGo" class="btn primary">Buscar</button></div>
       <div class="chips" id="radioChips"></div>
       <div id="radioList" class="list"></div>
     </section>
@@ -229,10 +230,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v8</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v9</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>
