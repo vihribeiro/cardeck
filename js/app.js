@@ -577,7 +577,7 @@
 
   /* ---------- YouTube (primeira parte: funciona com Premium) ---------- */
   function ytId(s) {
-    var m = String(s).match(/(?:youtu\.be\/|v=|\/shorts\/|\/embed\/)([\w-]{11})/); return m ? m[1] : null;
+    var m = String(s).match(/(?:youtu\.be\/|[?&]v=|\/(?:shorts|live|embed|v|e)\/)([\w-]{11})/); return m ? m[1] : null;
   }
   function ytOpen(q) {
     q = q.trim(); if (!q) return;
@@ -589,18 +589,45 @@
   $('#ytQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') ytOpen(this.value); });
   var playing = null;
   function playVideo(url) {
-    var id = ytId(url);
+    var id = ytId(url), lm = !id && String(url).match(/[?&]list=([\w-]+)/); if (lm) id = 'list:' + lm[1];
     toast('v' + APP_V + ' · modo ' + S.ytMode + ' · id ' + (id || 'nenhum') + (navigator.standalone ? ' · PWA' : ' · Safari'), false, 6000);
     if (S.ytMode !== 'app' && id) {
       playing = id; if (current !== 'yt') show('home');
-      var html = '<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/' + id + '?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
+      var html = embedHtml(id) +
         '<div class="row"><a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir no YouTube</a><button class="btn closePl">Fechar</button></div>';
       var box = $('#homeYt'); box.onclick = null; box.innerHTML = html;
       $('#ytPlayer').innerHTML = html;
-      $$('.player iframe').forEach(function (f) { f.addEventListener('load', function () { toast('player carregado', false, 2500); }); });
+      mountApi(box); mountApi($('#ytPlayer'));
       $$('.closePl').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); playing = null; $('#ytPlayer').innerHTML = ''; renderHomeYt(); }; });
-    } else window.open(url, '_blank');
+    } else if (!id) toast('Não reconheci esse link de vídeo: ' + String(url).slice(0, 60), true, 6000);
+    else window.open(url, '_blank');
   }
+  /* variantes do player: a = youtube-nocookie, b = youtube.com, c = IFrame API */
+  function embedHtml(id) {
+    var e = S.ytEmb || 'a', pl = id.indexOf('list:') === 0;
+    if (pl && e === 'c') e = 'a';
+    if (e === 'c') return '<div class="player"><div class="plhost" data-id="' + id + '"></div></div>';
+    var host = e === 'b' ? 'www.youtube.com' : 'www.youtube-nocookie.com';
+    return '<div class="player"><iframe src="https://' + host + '/embed/' + (pl ? 'videoseries' : id) + '?' + (pl ? 'list=' + id.slice(5) + '&' : '') + 'playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
+  }
+  var ytApiState = 0, ytApiQ = [];
+  function mountApi(root) {
+    var hs = root.querySelectorAll('.plhost'); if (!hs.length) return;
+    var go = function () { Array.prototype.forEach.call(hs, function (h) { new YT.Player(h, { videoId: h.dataset.id, playerVars: { playsinline: 1, rel: 0, origin: location.origin } }); }); };
+    if (ytApiState === 2) return go();
+    ytApiQ.push(go);
+    if (ytApiState === 0) {
+      ytApiState = 1; window.onYouTubeIframeAPIReady = function () { ytApiState = 2; ytApiQ.forEach(function (f) { f(); }); ytApiQ = []; };
+      var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+    }
+  }
+  function embInfo() { $('#embInfo').textContent = 'em uso: teste ' + (S.ytEmb || 'a').toUpperCase(); }
+  $('#ytTestCard').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-emb]') : null; if (!b) return;
+    S.ytEmb = b.dataset.emb; save(); embInfo();
+    var box = $('#ytTestBox'); box.innerHTML = embedHtml('jNQXAC9IVRw'); mountApi(box);
+  });
+  embInfo();
   function renderHomeYt() {
     if (playing) return;
     var box = $('#homeYt'), r = S.ytRecent.filter(function (x) { return ytId(x.url); })[0] || S.ytRecent[0], id = r && ytId(r.url);
@@ -828,7 +855,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 14;
+  var APP_V = 16;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
