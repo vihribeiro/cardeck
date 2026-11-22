@@ -590,12 +590,14 @@
   var playing = null;
   function playVideo(url) {
     var id = ytId(url);
+    toast('v' + APP_V + ' · modo ' + S.ytMode + ' · id ' + (id || 'nenhum') + (navigator.standalone ? ' · PWA' : ' · Safari'), false, 6000);
     if (S.ytMode !== 'app' && id) {
       playing = id; if (current !== 'yt') show('home');
       var html = '<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/' + id + '?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
         '<div class="row"><a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir no YouTube</a><button class="btn closePl">Fechar</button></div>';
       var box = $('#homeYt'); box.onclick = null; box.innerHTML = html;
       $('#ytPlayer').innerHTML = html;
+      $$('.player iframe').forEach(function (f) { f.addEventListener('load', function () { toast('player carregado', false, 2500); }); });
       $$('.closePl').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); playing = null; $('#ytPlayer').innerHTML = ''; renderHomeYt(); }; });
     } else window.open(url, '_blank');
   }
