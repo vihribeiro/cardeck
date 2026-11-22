@@ -158,6 +158,19 @@
 
   /* ---------- localização: GPS do iPad ou ponte ntfy com o iPhone ---------- */
   var loc = null, watchId = null, es = null, hdg = 0;
+  var CARS = {
+    arrow: ['Seta', '<path d="M20 2 L36 38 L20 29 L4 38 Z"/>'],
+    car: ['Carro', '<rect x="7" y="9" width="4" height="8" rx="1.5"/><rect x="29" y="9" width="4" height="8" rx="1.5"/><rect x="7" y="27" width="4" height="8" rx="1.5"/><rect x="29" y="27" width="4" height="8" rx="1.5"/><path d="M13 7 Q20 1 27 7 L29 15 L29 34 Q29 38 25 38 L15 38 Q11 38 11 34 L11 15 Z"/><path class="dk" d="M14 14 h12 l1.5 6 h-15 z M14.5 30 h11 l-1 4 h-9 z"/>'],
+    sport: ['Esportivo', '<path d="M20 1 Q27 3 28 12 L29 22 L31 36 Q31 39 27 39 H13 Q9 39 9 36 L11 22 L12 12 Q13 3 20 1 Z"/><path class="dk" d="M14 14 h12 l1 6 h-14 z M15 31 h10 l-.5 4 h-9 z"/>'],
+    moto: ['Moto', '<rect x="9" y="9" width="22" height="3.5" rx="1.7"/><rect x="17.5" y="3" width="5" height="34" rx="2.5"/><ellipse class="dk" cx="20" cy="22" rx="4" ry="6"/>'],
+    truck: ['Caminhão', '<rect x="11" y="1" width="18" height="12" rx="3"/><rect x="9.5" y="15" width="21" height="24" rx="2"/><path class="dk" d="M13 4 h14 l1 4 h-16 z"/>'],
+    dot: ['Ponto', '<circle cx="20" cy="23" r="12"/><path d="M20 1 L28 12 H12 Z"/>']
+  };
+  function carSvg(k) {
+    var c = CARS[k] || CARS.arrow;
+    return '<svg viewBox="0 0 40 40" style="fill:var(--acc);stroke:#fff;stroke-width:2;stroke-linejoin:round">' + c[1].replace(/class="dk"/g, 'style="fill:rgba(0,0,0,.5);stroke:none"') + '</svg>';
+  }
+  function carEl(el) { if (el && el.dataset.k !== (S.carIcon || 'arrow')) { el.dataset.k = S.carIcon || 'arrow'; el.innerHTML = carSvg(el.dataset.k); } }
   function navBearing() { return NAV && NAV.active ? hdg : null; }
   function setLoc(lat, lon, src, heading, speed) {
     var prev = loc;
@@ -220,9 +233,9 @@
       getZoom: function () { return m.getZoom(); },
       invalidate: function () { m.invalidateSize(); },
       setMe: function (lat, lon, h) {
-        if (!me) me = L.marker([lat, lon], { icon: L.divIcon({ className: '', html: '<div class="car"></div>', iconSize: [30, 30] }), interactive: false }).addTo(m);
+        if (!me) me = L.marker([lat, lon], { icon: L.divIcon({ className: '', html: '<div class="car"></div>', iconSize: [38, 38] }), interactive: false }).addTo(m);
         else me.setLatLng([lat, lon]);
-        var c = me.getElement() && me.getElement().firstChild; if (c) c.style.transform = 'rotate(' + h + 'deg)';
+        var c = me.getElement() && me.getElement().firstChild; carEl(c); if (c) c.style.transform = 'rotate(' + h + 'deg)';
       },
       setSel: function (lat, lon) { if (sel) m.removeLayer(sel); sel = L.marker([lat, lon]).addTo(m); },
       clearSel: function () { if (sel) { m.removeLayer(sel); sel = null; } },
@@ -279,7 +292,7 @@
       setMe: function (lat, lon, h) {
         if (!me) { var el = document.createElement('div'); el.className = 'car'; me = new mapboxgl.Marker({ element: el, rotationAlignment: 'map', pitchAlignment: 'map' }).setLngLat([lon, lat]).addTo(m); }
         else me.setLngLat([lon, lat]);
-        me.setRotation(h);
+        carEl(me.getElement()); me.setRotation(h);
       },
       setSel: function (lat, lon) { if (sel) sel.remove(); sel = new mapboxgl.Marker({ color: '#3b82f6' }).setLngLat([lon, lat]).addTo(m); },
       clearSel: function () { if (sel) { sel.remove(); sel = null; } },
@@ -826,12 +839,14 @@
   function renderThemeUi() {
     $('#accSw').innerHTML = ACCS.map(function (c) { return '<button class="sw' + (c === S.theme.acc ? ' on' : '') + '" data-c="' + c + '" style="background:' + c + '" aria-label="' + c + '"></button>'; }).join('');
     $('#bgChips').innerHTML = Object.keys(BGS).map(function (k) { return '<span class="chip' + (S.theme.bg === k ? ' on' : '') + '" data-bg="' + k + '">' + BGS[k][4] + '</span>'; }).join('');
+    $('#carChips').innerHTML = Object.keys(CARS).map(function (k) { return '<span class="chip' + ((S.carIcon || 'arrow') === k ? ' on' : '') + '" data-car="' + k + '">' + carSvg(k) + CARS[k][0] + '</span>'; }).join('');
     $('#accPick').value = S.theme.acc;
     var sel = $('#brandSel'); if (!sel.options.length) {
       sel.innerHTML = '<option value="">Nenhuma</option>' + BRANDS.map(function (b) { return '<option value="' + b[0] + '">' + b[1] + '</option>'; }).join('') + '<option value="custom" disabled>Minha logo (enviada)</option>';
     }
     sel.value = S.brand.img ? 'custom' : S.brand.id;
   }
+  $('#carChips').onclick = function (e) { var b = e.target.closest ? e.target.closest('.chip') : null; if (b) { S.carIcon = b.dataset.car; save(); renderThemeUi(); if (map && loc) map.setMe(loc.lat, loc.lon, hdg); } };
   $('#accSw').onclick = function (e) { var b = e.target.closest ? e.target.closest('.sw') : null; if (b) setAcc(b.dataset.c); };
   $('#bgChips').onclick = function (e) { var b = e.target.closest ? e.target.closest('.chip') : null; if (b) { S.theme.bg = b.dataset.bg; save(); applyTheme(); renderThemeUi(); } };
   $('#accPick').oninput = function () { S.theme.acc = this.value; save(); applyTheme(); };
@@ -859,7 +874,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 24;
+  var APP_V = 25;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];

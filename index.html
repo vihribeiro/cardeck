@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=24">
+<link rel="stylesheet" href="css/app.css?v=25">
 </head>
 <body>
 <div id="app">
@@ -161,6 +161,8 @@
         <div class="opt"><input type="color" id="accPick" aria-label="Escolher cor"><input type="range" id="accHue" class="hue" min="0" max="360" aria-label="Matiz"></div>
         <div class="muted small" style="margin-top:8px">Fundo</div>
         <div class="chips" id="bgChips" style="margin-top:8px"></div>
+        <div class="muted small" style="margin-top:8px">Ícone do veículo no mapa</div>
+        <div class="chips carchips" id="carChips" style="margin-top:8px"></div>
         <div class="muted small">Logo da marca (canto superior esquerdo)</div>
         <div class="opt"><select id="brandSel"></select></div>
         <div class="row" style="margin-top:0"><label class="btn"><i class="ic" data-ic="plus"></i> Enviar minha logo<input type="file" id="brandFile" accept="image/*" hidden></label><button class="btn" id="brandClear">Remover logo</button></div>
@@ -246,10 +248,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v24</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v25</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=24"></script>
+<script src="js/app.js?v=25"></script>
 </body>
 </html>
