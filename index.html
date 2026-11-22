@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=32">
+<link rel="stylesheet" href="css/app.css?v=33">
 </head>
 <body>
 <div id="app">
@@ -95,8 +95,12 @@
             <button id="goRadio" class="btn block"><i class="ic" data-ic="radio"></i> Rádios no iPad</button>
           </div>
           <div class="card ytcard win" id="winYt">
-            <div class="row" style="margin:0 0 10px"><h3 style="margin:0;color:#ff4d4d;flex:1"><i class="ic" data-ic="youtube"></i> YouTube</h3><button id="goYt" class="btn"><i class="ic" data-ic="search"></i> Buscar</button></div>
+            <div class="row" style="margin:0 0 10px"><h3 style="margin:0;color:#ff4d4d;flex:1"><i class="ic" data-ic="youtube"></i> YouTube</h3></div>
+            <div class="searchbar" style="margin:0 0 8px"><input id="hyQ" type="search" placeholder="Pesquisar no YouTube" autocomplete="off" autocorrect="off"><button id="hyGo" class="btn primary">Buscar</button></div>
+            <div class="chips pdf" style="margin:0 0 8px"><span class="chip" data-f="all">Tudo</span><span class="chip" data-f="live">Ao vivo</span><span class="chip" data-f="music">Músicas</span></div>
             <div id="homeYt" class="homeyt"></div>
+            <div id="hyStatus" class="muted small"></div>
+            <div id="hyRes" class="list hyres"></div>
           </div>
         <div id="winTray" class="wintray hidden"></div>
       </div>
@@ -126,7 +130,7 @@
           <input id="pdQ" type="search" placeholder="Pesquisar no YouTube" autocomplete="off" autocorrect="off">
           <button id="pdGo" class="btn primary">Buscar</button>
         </div>
-        <div class="chips" id="pdFilter" style="margin:8px 0"><span class="chip on" data-f="all">Tudo</span><span class="chip" data-f="live">Ao vivo</span><span class="chip" data-f="music">Músicas</span></div>
+        <div class="chips pdf" style="margin:8px 0"><span class="chip" data-f="all">Tudo</span><span class="chip" data-f="live">Ao vivo</span><span class="chip" data-f="music">Músicas</span></div>
         <div id="pdPlayer"></div>
         <div id="pdStatus" class="muted small"></div>
         <div id="pdRes" class="list" style="margin-top:8px"></div>
@@ -217,10 +221,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v32</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v33</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=32"></script>
+<script src="js/app.js?v=33"></script>
 </body>
 </html>

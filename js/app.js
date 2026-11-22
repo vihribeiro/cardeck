@@ -605,10 +605,9 @@
   function renderHomeYt() {
     if (playing) return;
     var box = $('#homeYt');
-    box.innerHTML = '<div class="muted">Busque um vídeo ou uma live na aba YouTube.</div>';
-    box.onclick = function () { show('yt'); };
+    box.innerHTML = '<div class="muted">Pesquise um vídeo, uma live ou uma música.</div>';
+    box.onclick = null;
   }
-  $('#goYt').onclick = function () { show('yt'); };
   $('#goRadio').onclick = function () { show('music'); };
   $('#btnExpand').onclick = function () { show(current === 'map' ? 'home' : 'map'); };
   /* ---------- busca + player via Piped (teste: sem anuncios, sem login Google) ---------- */
@@ -625,9 +624,10 @@
     }
     return next();
   }
-  function pdSearch(q) {
+  function pdSearch(q, home) {
     q = q.trim(); if (!q) return;
-    $('#pdStatus').textContent = 'Buscando…'; $('#pdRes').innerHTML = '';
+    var st = $(home ? '#hyStatus' : '#pdStatus'), rs = $(home ? '#hyRes' : '#pdRes');
+    st.textContent = 'Buscando…'; rs.innerHTML = '';
     var music = S.pdF === 'music', live = S.pdF === 'live';
     pdFetch('/search?q=' + encodeURIComponent(live ? q + ' live' : q) + '&filter=' + (music ? 'music_songs' : 'videos')).then(function (o) {
       var items = (o.j.items || []).filter(function (x) { return x.type === 'stream' && /v=([\w-]{11})/.test(x.url); });
@@ -635,15 +635,15 @@
       if (music) items = items.filter(function (x) { return x.duration > 0; });
       else if (live) items = items.filter(isLive);
       else items = items.filter(isLive).concat(items.filter(function (x) { return !isLive(x); }));
-      $('#pdStatus').textContent = items.length ? '' : (live ? 'Nenhuma transmissão ao vivo encontrada para essa busca.' : 'Nada encontrado.');
+      st.textContent = items.length ? '' : (live ? 'Nenhuma transmissão ao vivo encontrada para essa busca.' : 'Nada encontrado.');
       items.forEach(function (x) {
         var id = x.url.match(/v=([\w-]{11})/)[1], el = document.createElement('div'); el.className = 'item';
         var d = x.duration > 0 ? Math.floor(x.duration / 60) + ':' + ('0' + (x.duration % 60)).slice(-2) : 'AO VIVO';
         el.innerHTML = '<img style="width:96px;height:54px" src="https://i.ytimg.com/vi/' + id + '/mqdefault.jpg"><div class="t"><b>' + esc(x.title) + '</b><span>' + esc(x.uploaderName || '') + ' · ' + (isLive(x) ? '<em style="color:#ff4d4d;font-style:normal;font-weight:600">● AO VIVO</em>' : d) + '</span></div>';
-        el.onclick = function () { $$('#pdRes .item').forEach(function (e) { e.classList.remove('playing'); }); el.classList.add('playing'); pdPlay(id, o.k, x.title, isLive(x)); };
-        $('#pdRes').appendChild(el);
+        el.onclick = function () { $$('.hyres .item,#pdRes .item').forEach(function (e) { e.classList.remove('playing'); }); el.classList.add('playing'); pdPlay(id, o.k, x.title, isLive(x)); };
+        rs.appendChild(el);
       });
-    }).catch(function () { $('#pdStatus').textContent = 'Os servidores de busca não responderam. Tente de novo em instantes.'; });
+    }).catch(function () { st.textContent = 'Os servidores de busca não responderam. Tente de novo em instantes.'; });
   }
   /* player unico: acompanha voce entre a home e a aba YouTube */
   var CUR = null;
@@ -698,13 +698,18 @@
       pdRender(slot);
     }).catch(function () { embed(); });
   }
-  $('#pdFilter').onclick = function (e) {
-    var c = e.target.closest ? e.target.closest('.chip') : null; if (!c) return;
-    S.pdF = c.dataset.f; save();
-    $$('#pdFilter .chip').forEach(function (x) { x.classList.toggle('on', x === c); });
-    if ($('#pdQ').value.trim()) pdSearch($('#pdQ').value);
-  };
-  $$('#pdFilter .chip').forEach(function (x) { x.classList.toggle('on', x.dataset.f === (S.pdF || 'all')); });
+  $$('.pdf').forEach(function (box) {
+    box.onclick = function (e) {
+      var c = e.target.closest ? e.target.closest('.chip') : null; if (!c) return;
+      S.pdF = c.dataset.f; save();
+      $$('.pdf .chip').forEach(function (x) { x.classList.toggle('on', x.dataset.f === S.pdF); });
+      var home = box.parentNode.contains($('#hyQ'));
+      if ($(home ? '#hyQ' : '#pdQ').value.trim()) pdSearch($(home ? '#hyQ' : '#pdQ').value, home);
+    };
+  });
+  $$('.pdf .chip').forEach(function (x) { x.classList.toggle('on', x.dataset.f === (S.pdF || 'all')); });
+  $('#hyGo').onclick = function () { pdSearch($('#hyQ').value, true); };
+  $('#hyQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') pdSearch(this.value, true); });
   $('#pdGo').onclick = function () { pdSearch($('#pdQ').value); };
   $('#pdQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') pdSearch(this.value); });
 
@@ -789,7 +794,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 32;
+  var APP_V = 33;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
