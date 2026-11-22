@@ -1,5 +1,5 @@
 /* Service worker: guarda o "casco" do app para abrir rápido/offline. APIs e tiles vão direto à rede. */
-var CACHE = 'cardeck-shell-v7';
+var CACHE = 'cardeck-shell-v8';
 var SHELL = ['./', 'index.html', 'css/app.css', 'js/app.js', 'leaflet/leaflet.js', 'leaflet/leaflet.css', 'mapbox/mapbox-gl.js', 'mapbox/mapbox-gl.css',
   'leaflet/images/marker-icon.png', 'leaflet/images/marker-icon-2x.png', 'leaflet/images/marker-shadow.png',
   'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-180.png'];

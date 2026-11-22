@@ -544,9 +544,14 @@
     var tryN = function (i, why) {
       if (playingId !== s.stationuuid) return;
       if (i >= urls.length) { playingId = null; setNP(null); renderRadios(); toast('Não foi possível tocar esta rádio' + (why ? ' (' + why + ')' : '') + '.', true); return; }
-      audio.onerror = function () { audio.onerror = null; tryN(i + 1, 'erro ' + (audio.error ? audio.error.code : '?')); };
-      audio.pause(); audio.src = urls[i]; audio.load();
-      var p = audio.play(); if (p && p.catch) p.catch(function (e) { if (e && e.name === 'AbortError') return; audio.onerror = null; tryN(i + 1, e && e.name); });
+      var done = false, tm;
+      var fail = function (w) { if (done) return; done = true; clearTimeout(tm); audio.onerror = null; audio.onplaying = null; tryN(i + 1, w); };
+      audio.onerror = function () { fail('erro ' + (audio.error ? audio.error.code : '?')); };
+      audio.onplaying = function () { done = true; clearTimeout(tm); $('#homeNP').innerHTML = '<b>' + esc(s.name.trim()) + '</b> <span class="muted">· ao vivo</span>'; };
+      $('#homeNP').innerHTML = '<b>' + esc(s.name.trim()) + '</b> <span class="muted">· conectando…</span>';
+      tm = setTimeout(function () { fail('sem resposta, rede ' + audio.networkState + '/estado ' + audio.readyState); }, 9000);
+      audio.src = urls[i];
+      var p = audio.play(); if (p && p.catch) p.catch(function (e) { if (e && e.name === 'AbortError') return; fail(e && e.name); });
     };
     tryN(0);
   }
