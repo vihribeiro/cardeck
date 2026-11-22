@@ -620,13 +620,6 @@
       var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
     }
   }
-  function embInfo() { $('#embInfo').textContent = 'em uso: teste ' + (S.ytEmb || 'a').toUpperCase(); }
-  $('#ytTestCard').addEventListener('click', function (e) {
-    var b = e.target.closest ? e.target.closest('[data-emb]') : null; if (!b) return;
-    S.ytEmb = b.dataset.emb; save(); embInfo();
-    var box = $('#ytTestBox'); box.innerHTML = embedHtml('jNQXAC9IVRw'); mountApi(box);
-  });
-  embInfo();
   function renderHomeYt() {
     if (playing) return;
     var box = $('#homeYt'), r = S.ytRecent.filter(function (x) { return ytId(x.url); })[0] || S.ytRecent[0], id = r && ytId(r.url);
@@ -854,7 +847,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 17;
+  var APP_V = 18;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
