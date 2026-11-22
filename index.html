@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=13">
+<link rel="stylesheet" href="css/app.css?v=14">
 </head>
 <body>
 <div id="app">
@@ -163,6 +163,7 @@
         <div class="muted small">Logo da marca (canto superior esquerdo)</div>
         <div class="opt"><select id="brandSel"></select></div>
         <div class="row" style="margin-top:0"><label class="btn"><i class="ic" data-ic="plus"></i> Enviar minha logo<input type="file" id="brandFile" accept="image/*" hidden></label><button class="btn" id="brandClear">Remover logo</button></div>
+        <div class="row"><button class="btn" id="btnUpdate"><i class="ic" data-ic="reset"></i> Atualizar o app agora</button><span class="muted small" id="verInfo"></span></div>
         <p class="muted small">As opções da lista são emblemas com a sigla da marca (não incluo as logos oficiais por serem marcas registradas). Para usar a logo real, envie o arquivo da imagem.</p>
       </div>
 
@@ -244,10 +245,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v13</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v14</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=13"></script>
+<script src="js/app.js?v=14"></script>
 </body>
 </html>

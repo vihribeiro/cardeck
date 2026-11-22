@@ -824,6 +824,24 @@
     rd.readAsDataURL(f);
   };
   applyTheme(); renderThemeUi();
+
+  /* ---------- atualização do app ---------- */
+  var APP_V = 14;
+  function hardReload() {
+    var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
+    var p = [];
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) p.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
+    if (window.caches) p.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
+    Promise.all(p).then(done, done);
+  }
+  $('#verInfo').textContent = 'versão v' + APP_V;
+  $('#btnUpdate').onclick = hardReload;
+  try {
+    fetch('index.html?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
+      var m = t.match(/js\/app\.js\?v=(\d+)/);
+      if (m && +m[1] > APP_V && sessionStorage.getItem('cd.upd') !== m[1]) { sessionStorage.setItem('cd.upd', m[1]); hardReload(); }
+    }).catch(function () {});
+  } catch (e) {}
   function renderSettings() {
     renderThemeUi();
     $$('input[name=locMode]').forEach(function (r) { r.checked = r.value === S.locMode; });
