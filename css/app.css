@@ -8,7 +8,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
   font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
   overscroll-behavior:none;-webkit-user-select:none;user-select:none}
 input,select{-webkit-user-select:text;user-select:text}
-#app{display:flex;height:100%;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#app{display:flex;height:100%;padding:max(env(safe-area-inset-top),22px) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 #dock{width:var(--dock);background:#0f1218;border-right:1px solid var(--line);display:flex;flex-direction:column;
   justify-content:center;gap:10px;padding:10px 8px}
 #dock button{background:var(--card);border:0;border-radius:18px;color:var(--txt);font-size:28px;padding:12px 0 8px;
@@ -216,3 +216,6 @@ input.hue::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:
 .destchip{max-width:46vw;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:12px;border-left:2px solid var(--acc)}
 .mapcard:has(#navPanel:not(.hidden)) .map-search,.mapcard:has(#navPanel:not(.hidden)) .results.floating{display:none}
 .mapcard.full:has(#navPanel:not(.hidden)) .hud-l{display:flex}
+
+/* folga no topo (barra/janela do iPad) */
+.mapcard.full{top:max(env(safe-area-inset-top),22px)!important}
