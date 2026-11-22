@@ -185,3 +185,25 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 input.hue{-webkit-appearance:none;appearance:none;flex:1;min-width:140px;height:22px;border-radius:11px;padding:0;border:0;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
 input.hue::-webkit-slider-thumb{-webkit-appearance:none;width:32px;height:32px;border-radius:50%;background:#fff;border:3px solid #000}
 input.hue::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:#fff;border:3px solid #000}
+
+/* mapa mais limpo (v20) */
+.hud-l{padding:4px 12px;border-radius:14px}
+.hud-l .greet,.hud-l #date{display:none}
+.hud-l .clock{font-size:26px;line-height:1.15}
+.hud-r{flex-direction:row;gap:6px;top:12px}
+.pill{padding:4px 10px;font-size:12px}
+.map-search{top:64px}
+.mapctl{top:64px}
+.mapctl button{width:42px;height:42px}
+.mapcard.full .map-search{top:14px}
+.mapcard.full .hud-l,.mapcard.full .hud-r{display:none}
+.mapcard:has(#navPanel:not(.hidden)) .hud-r,.mapcard:has(#navPanel:not(.hidden)) .favstrip{display:none}
+#navPanel{max-width:400px;padding:8px 12px;border-radius:16px;right:auto}
+#navPanel .nav-main{gap:10px}
+#navPanel .nav-arrow{font-size:30px;width:40px}
+#navPanel .nav-dist{font-size:24px;line-height:1.1}
+#navPanel .nav-text{font-size:14px}
+#navPanel .row{margin-top:6px;gap:6px;flex-wrap:nowrap}
+#navPanel .btn{padding:8px 12px;font-size:14px;border-radius:12px}
+#navPanel #navEta{font-size:12px}
+.mapcard:not(.full) #navPanel{bottom:16px}
