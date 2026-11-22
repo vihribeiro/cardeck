@@ -157,10 +157,18 @@
   }
 
   /* ---------- localização: GPS do iPad ou ponte ntfy com o iPhone ---------- */
-  var loc = null, watchId = null, es = null;
+  var loc = null, watchId = null, es = null, hdg = 0;
+  function navBearing() { return NAV && NAV.active ? hdg : null; }
   function setLoc(lat, lon, src, heading, speed) {
     var prev = loc;
     loc = { lat: lat, lon: lon, src: src, t: Date.now(), heading: heading, speed: speed };
+    var nh = null;
+    if (typeof heading === 'number' && isFinite(heading) && speed > 1) nh = heading;
+    else if (prev && dist([prev.lat, prev.lon], [lat, lon]) > 6) {
+      var p1 = prev.lat * Math.PI / 180, p2 = lat * Math.PI / 180, dl = (lon - prev.lon) * Math.PI / 180;
+      nh = (Math.atan2(Math.sin(dl) * Math.cos(p2), Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl)) * 180 / Math.PI + 360) % 360;
+    }
+    if (nh != null) { var df = ((nh - hdg + 540) % 360) - 180; hdg = (hdg + df * 0.6 + 360) % 360; }
     $('#locStatus').innerHTML = ic('pin') + ' ' + (src === 'gps' ? 'GPS do iPad' : 'Localização do iPhone');
     weather();
     updateMe(prev);
@@ -263,7 +271,8 @@
     });
     return {
       kind: 'mapbox', st: st,
-      setView: function (lat, lon, z) { m.easeTo({ center: [lon, lat], zoom: z == null ? m.getZoom() : z, duration: 600 }); },
+      setView: function (lat, lon, z, b) { var o = { center: [lon, lat], zoom: z == null ? m.getZoom() : z, duration: 600 }; if (b != null) { o.bearing = b; o.duration = 900; o.offset = [0, 140]; } m.easeTo(o); },
+      resetBearing: function () { m.easeTo({ bearing: 0, offset: [0, 0], duration: 600 }); },
       getZoom: function () { return m.getZoom(); },
       invalidate: function () { m.resize(); },
       setMe: function (lat, lon) {
@@ -312,9 +321,9 @@
     if (!map || !loc) return;
     map.setMe(loc.lat, loc.lon);
     if (!meSet) { meSet = true; map.setView(loc.lat, loc.lon, 15); }
-    else if (follow) map.setView(loc.lat, loc.lon);
+    else if (follow) map.setView(loc.lat, loc.lon, null, navBearing());
   }
-  $('#recenter').onclick = function () { if (loc && map) { follow = true; map.setView(loc.lat, loc.lon, Math.max(map.getZoom(), 16)); } else toast('Sem localização ainda', true); };
+  $('#recenter').onclick = function () { if (loc && map) { follow = true; map.setView(loc.lat, loc.lon, Math.max(map.getZoom(), 16), navBearing()); } else toast('Sem localização ainda', true); };
 
   /* ---------- busca de lugares (Photon / OSM) ---------- */
   function search(q, box) {
@@ -452,13 +461,13 @@
   $('#btnStartNav').onclick = function () {
     if (!NAV) return; NAV.active = true; follow = true;
     $('#btnStartNav').classList.add('hidden'); show('map');
-    map.setView(loc.lat, loc.lon, 17); navRender();
+    map.setView(loc.lat, loc.lon, 17, hdg); navRender();
     speak(stepText(NAV.steps[0]));
   };
   $('#btnMute').onclick = function () { muted = !muted; this.innerHTML = ic(muted ? 'volume-x' : 'volume'); if (muted && window.speechSynthesis) speechSynthesis.cancel(); };
   $('#btnEndNav').onclick = endNav;
   function endNav() {
-    NAV = null; follow = false; map.clearRoute();
+    NAV = null; follow = false; map.clearRoute(); if (map.resetBearing) map.resetBearing();
     $('#navPanel').classList.add('hidden'); $('#destChip').classList.add('hidden'); if (window.speechSynthesis) speechSynthesis.cancel();
   }
   function nearest(lat, lon) { // índice do ponto mais próximo da rota
@@ -848,7 +857,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 21;
+  var APP_V = 22;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
