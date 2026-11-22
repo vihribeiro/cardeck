@@ -143,3 +143,12 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 .winctl .wx{position:absolute;right:10px;top:10px;width:44px;height:44px;border-radius:22px;border:0;background:var(--bad);color:#fff;display:flex;align-items:center;justify-content:center;padding:0}
 .winctl .wrs{position:absolute;right:0;bottom:0;width:56px;height:56px;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 50%,var(--acc) 50%);border-bottom-right-radius:inherit}
 .wintray{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3000;display:flex;gap:10px;background:rgba(15,18,24,.94);border:1px solid var(--line);border-radius:20px;padding:10px}
+
+/* now playing + VU */
+.np{display:flex;align-items:center;gap:12px;color:var(--txt);margin-top:4px}
+.np img{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--card2);flex:none}
+.npt{flex:1;min-width:0}.npt b,.npt span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npt span{font-size:13px}
+.vu{display:flex;align-items:flex-end;gap:3px;height:36px;flex:none}
+.vu i{width:5px;height:100%;border-radius:2px;background:linear-gradient(to top,var(--ok) 0 55%,#facc15 55% 80%,var(--bad) 80%);transform-origin:bottom;transform:scaleY(.08);opacity:.5}
+.vu.on i{opacity:1;animation:vu 0.8s ease-in-out infinite alternate}
+@keyframes vu{0%{transform:scaleY(.12)}100%{transform:scaleY(1)}}

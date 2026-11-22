@@ -551,16 +551,21 @@
       var done = false, tm;
       var fail = function (w) { if (done) return; done = true; clearTimeout(tm); audio.onerror = null; audio.onplaying = null; tryN(i + 1, w); };
       audio.onerror = function () { fail('erro ' + (audio.error ? audio.error.code : '?')); };
-      audio.onplaying = function () { done = true; clearTimeout(tm); $('#homeNP').innerHTML = '<b>' + esc(s.name.trim()) + '</b> <span class="muted">· ao vivo</span>'; };
-      $('#homeNP').innerHTML = '<b>' + esc(s.name.trim()) + '</b> <span class="muted">· conectando…</span>';
+      audio.onplaying = function () { done = true; clearTimeout(tm); $('#homeNP').innerHTML = npHtml(s, true); };
+      $('#homeNP').innerHTML = npHtml(s, false);
       tm = setTimeout(function () { fail('sem resposta, rede ' + audio.networkState + '/estado ' + audio.readyState); }, 9000);
       audio.src = urls[i];
       var p = audio.play(); if (p && p.catch) p.catch(function (e) { if (e && e.name === 'AbortError') return; fail(e && e.name); });
     };
     tryN(0);
   }
+  function npHtml(s, live) {
+    var bars = '', i; for (i = 0; i < 14; i++) bars += '<i style="animation-delay:-' + (Math.random() * 1.2).toFixed(2) + 's;animation-duration:' + (0.5 + Math.random() * 0.7).toFixed(2) + 's"></i>';
+    var logo = s.favicon && /^https:/.test(s.favicon) ? '<img src="' + esc(s.favicon) + '" onerror="this.style.display=\'none\'">' : '';
+    return '<div class="np">' + logo + '<div class="npt"><b>' + esc(s.name.trim()) + '</b><span class="muted">' + (live ? 'ao vivo' : 'conectando…') + '</span></div><div class="vu' + (live ? ' on' : '') + '">' + bars + '</div></div>';
+  }
   function setNP(s) {
-    $('#homeNP').innerHTML = s ? '<b>' + esc(s.name.trim()) + '</b> <span class="muted">· ao vivo</span>' : 'Nada tocando';
+    $('#homeNP').innerHTML = s ? npHtml(s, false) : 'Nada tocando';
     if ('mediaSession' in navigator && s) navigator.mediaSession.metadata = new MediaMetadata({ title: s.name.trim(), artist: 'Rádio ao vivo' });
   }
 
