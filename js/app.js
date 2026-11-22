@@ -665,6 +665,54 @@
     });
   }
 
+  /* ---------- busca + player via Piped (teste: sem anuncios, sem login Google) ---------- */
+  var PIPED = [['https://api.piped.private.coffee', 'https://piped.private.coffee'], ['https://pipedapi.kavin.rocks', 'https://piped.video']];
+  function pdFetch(path) {
+    var i = 0, order = PIPED.map(function (p, k) { return k; });
+    if (S.pdBest) order.sort(function (a, b) { return (b === S.pdBest.i) - (a === S.pdBest.i); });
+    function next() {
+      if (i >= order.length) return Promise.reject(new Error('nenhum servidor respondeu'));
+      var k = order[i++], ctl = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 9000);
+      return fetch(PIPED[k][0] + path, ctl ? { signal: ctl.signal } : {}).then(function (r) { clearTimeout(tm); if (!r.ok) throw 0; return r.json(); })
+        .then(function (j) { if (j && j.error) throw 0; S.pdBest = { i: k }; return { j: j, k: k }; })
+        .catch(function () { clearTimeout(tm); return next(); });
+    }
+    return next();
+  }
+  function pdSearch(q) {
+    q = q.trim(); if (!q) return;
+    $('#pdStatus').textContent = 'Buscando…'; $('#pdRes').innerHTML = '';
+    pdFetch('/search?q=' + encodeURIComponent(q) + '&filter=videos').then(function (o) {
+      var items = (o.j.items || []).filter(function (x) { return x.type === 'stream' && /v=([\w-]{11})/.test(x.url); });
+      $('#pdStatus').textContent = items.length ? '' : 'Nada encontrado.';
+      items.forEach(function (x) {
+        var id = x.url.match(/v=([\w-]{11})/)[1], el = document.createElement('div'); el.className = 'item';
+        var d = x.duration > 0 ? Math.floor(x.duration / 60) + ':' + ('0' + (x.duration % 60)).slice(-2) : 'AO VIVO';
+        el.innerHTML = '<img style="width:96px;height:54px" src="https://i.ytimg.com/vi/' + id + '/mqdefault.jpg"><div class="t"><b>' + esc(x.title) + '</b><span>' + esc((x.uploaderName || '') + ' · ' + d) + '</span></div>';
+        el.onclick = function () { $$('#pdRes .item').forEach(function (e) { e.classList.remove('playing'); }); el.classList.add('playing'); pdPlay(id, o.k); };
+        $('#pdRes').appendChild(el);
+      });
+    }).catch(function () { $('#pdStatus').textContent = 'Os servidores de busca não responderam. Tente de novo em instantes.'; });
+  }
+  function pdPlay(id, k) {
+    var box = $('#pdPlayer'); box.innerHTML = '<div class="muted small">Carregando vídeo…</div>';
+    var frame = function (why) {
+      box.innerHTML = '<div class="player"><iframe src="' + PIPED[k][1] + '/embed/' + id + '?autoplay=1" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>';
+      $('#pdStatus').textContent = 'Player alternativo (' + why + ').';
+    };
+    pdFetch('/streams/' + id).then(function (o) {
+      var vs = (o.j.videoStreams || []).filter(function (v) { return !v.videoOnly && /MPEG_4|MP4/i.test(v.format) && !/HLS/i.test(v.format); });
+      vs.sort(function (a, b) { return (b.height || parseInt(b.quality) || 0) - (a.height || parseInt(a.quality) || 0); });
+      var u = o.j.hls || (vs[0] && vs[0].url);
+      if (!u) return frame('sem stream direto');
+      box.innerHTML = '<div class="player"><video controls autoplay playsinline webkit-playsinline src="' + esc(u) + '"></video></div><div class="muted small" style="margin-top:6px">' + esc(o.j.title || '') + ' · ' + (vs[0] ? esc(vs[0].quality) : 'HLS') + '</div>';
+      var v = box.querySelector('video'); v.onerror = function () { frame('o vídeo não carregou'); };
+      var pr = v.play && v.play(); if (pr && pr.catch) pr.catch(function () {});
+    }).catch(function () { frame('servidor sem resposta'); });
+  }
+  $('#pdGo').onclick = function () { pdSearch($('#pdQ').value); };
+  $('#pdQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') pdSearch(this.value); });
+
   /* ---------- conta Google / YouTube (OAuth via Google Identity Services) ---------- */
   var G_SCOPE = 'https://www.googleapis.com/auth/youtube.readonly';
   var gisPromise = null, tokenClient = null, ytTab = 'playlists', ytStack = [];
@@ -874,7 +922,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 25;
+  var APP_V = 26;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];

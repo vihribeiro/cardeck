@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=25">
+<link rel="stylesheet" href="css/app.css?v=26">
 </head>
 <body>
 <div id="app">
@@ -120,6 +120,16 @@
     <!-- YOUTUBE -->
     <section id="v-yt" class="view">
       <h2>YouTube</h2>
+      <div class="card" id="pdCard">
+        <h3>Buscar vídeos (teste sem anúncios)</h3>
+        <div class="searchbar">
+          <input id="pdQ" type="search" placeholder="Pesquisar no YouTube" autocomplete="off" autocorrect="off">
+          <button id="pdGo" class="btn primary">Buscar</button>
+        </div>
+        <div id="pdPlayer"></div>
+        <div id="pdStatus" class="muted small"></div>
+        <div id="pdRes" class="list" style="margin-top:8px"></div>
+      </div>
       <div class="card">
         <p class="muted">Quem tem <b>YouTube Premium</b> assiste sem anúncios abrindo direto no YouTube (ele usa o seu login do Safari). Cole um link ou digite uma busca.</p>
         <div class="searchbar">
@@ -248,10 +258,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v25</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v26</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=25"></script>
+<script src="js/app.js?v=26"></script>
 </body>
 </html>
