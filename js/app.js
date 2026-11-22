@@ -628,11 +628,12 @@
   function pdSearch(q) {
     q = q.trim(); if (!q) return;
     $('#pdStatus').textContent = 'Buscando…'; $('#pdRes').innerHTML = '';
-    var live = S.pdLive;
-    pdFetch('/search?q=' + encodeURIComponent(live ? q + ' live' : q) + '&filter=videos').then(function (o) {
+    var music = S.pdF === 'music', live = S.pdF === 'live';
+    pdFetch('/search?q=' + encodeURIComponent(live ? q + ' live' : q) + '&filter=' + (music ? 'music_songs' : 'videos')).then(function (o) {
       var items = (o.j.items || []).filter(function (x) { return x.type === 'stream' && /v=([\w-]{11})/.test(x.url); });
       var isLive = function (x) { return !(x.duration > 0); };
-      if (live) items = items.filter(isLive);
+      if (music) items = items.filter(function (x) { return x.duration > 0; });
+      else if (live) items = items.filter(isLive);
       else items = items.filter(isLive).concat(items.filter(function (x) { return !isLive(x); }));
       $('#pdStatus').textContent = items.length ? '' : (live ? 'Nenhuma transmissão ao vivo encontrada para essa busca.' : 'Nada encontrado.');
       items.forEach(function (x) {
@@ -699,11 +700,11 @@
   }
   $('#pdFilter').onclick = function (e) {
     var c = e.target.closest ? e.target.closest('.chip') : null; if (!c) return;
-    S.pdLive = c.dataset.f === 'live'; save();
+    S.pdF = c.dataset.f; save();
     $$('#pdFilter .chip').forEach(function (x) { x.classList.toggle('on', x === c); });
     if ($('#pdQ').value.trim()) pdSearch($('#pdQ').value);
   };
-  $$('#pdFilter .chip').forEach(function (x) { x.classList.toggle('on', (x.dataset.f === 'live') === !!S.pdLive); });
+  $$('#pdFilter .chip').forEach(function (x) { x.classList.toggle('on', x.dataset.f === (S.pdF || 'all')); });
   $('#pdGo').onclick = function () { pdSearch($('#pdQ').value); };
   $('#pdQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') pdSearch(this.value); });
 
@@ -788,7 +789,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 31;
+  var APP_V = 32;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
