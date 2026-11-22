@@ -51,7 +51,6 @@
     if (v === 'home') renderHomeYt();
     if (v === 'home' || v === 'yt') pdPlace(v === 'home' ? 'home' : 'yt');
     if (v === 'music') loadRadios();
-    if (v === 'yt') { renderYtRecent(); renderYtAccount(); if (gValid() && !$('#ytItems').children.length) ytLoadTab(); }
     if (v === 'settings') renderSettings();
   }
   $$('#dock button[data-view]').forEach(function (b) { b.onclick = function () { show(b.dataset.view); }; });
@@ -601,71 +600,17 @@
     if ('mediaSession' in navigator && s) navigator.mediaSession.metadata = new MediaMetadata({ title: s.name.trim(), artist: 'Rádio ao vivo' });
   }
 
-  /* ---------- YouTube (primeira parte: funciona com Premium) ---------- */
-  function ytId(s) {
-    var m = String(s).match(/(?:youtu\.be\/|[?&]v=|\/(?:shorts|live|embed|v|e)\/)([\w-]{11})/); return m ? m[1] : null;
-  }
-  function ytOpen(q) {
-    q = q.trim(); if (!q) return;
-    var id = ytId(q), url = id ? 'https://www.youtube.com/watch?v=' + id : /^https?:\/\//.test(q) ? q : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
-    S.ytRecent = [{ q: q, url: url, t: Date.now() }].concat(S.ytRecent.filter(function (r) { return r.url !== url; })).slice(0, 10); save();
-    renderYtRecent(); renderHomeYt(); playVideo(url);
-  }
-  $('#ytGo').onclick = function () { ytOpen($('#ytQ').value); };
-  $('#ytQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') ytOpen(this.value); });
+  /* ---------- YouTube: card da home ---------- */
   var playing = null;
-  function playVideo(url) {
-    var id = ytId(url), lm = !id && String(url).match(/[?&]list=([\w-]+)/); if (lm) id = 'list:' + lm[1];
-    if (S.ytMode !== 'app' && id) {
-      pdDrop(); playing = id; if (current !== 'yt') show('home');
-      var html = embedHtml(id) +
-        '<div class="row"><a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir no YouTube</a><button class="btn closePl">Fechar</button></div>';
-      var box = $('#homeYt'); box.onclick = null; box.innerHTML = html;
-      $('#ytPlayer').innerHTML = html;
-      mountApi(box); mountApi($('#ytPlayer'));
-      $$('.closePl').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); playing = null; $('#ytPlayer').innerHTML = ''; renderHomeYt(); }; });
-    } else if (!id) toast('Não reconheci esse link de vídeo: ' + String(url).slice(0, 60), true, 6000);
-    else window.open(url, '_blank');
-  }
-  /* variantes do player: a = youtube-nocookie, b = youtube.com, c = IFrame API */
-  function embedHtml(id) {
-    var e = S.ytEmb || 'a', pl = id.indexOf('list:') === 0;
-    if (pl && e === 'c') e = 'a';
-    if (e === 'c') return '<div class="player"><div class="plhost" data-id="' + id + '"></div></div>';
-    var host = e === 'b' ? 'www.youtube.com' : 'www.youtube-nocookie.com';
-    return '<div class="player"><iframe src="https://' + host + '/embed/' + (pl ? 'videoseries' : id) + '?' + (pl ? 'list=' + id.slice(5) + '&' : '') + 'playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>';
-  }
-  var ytApiState = 0, ytApiQ = [];
-  function mountApi(root) {
-    var hs = root.querySelectorAll('.plhost'); if (!hs.length) return;
-    var go = function () { Array.prototype.forEach.call(hs, function (h) { new YT.Player(h, { videoId: h.dataset.id, playerVars: { playsinline: 1, rel: 0, origin: location.origin } }); }); };
-    if (ytApiState === 2) return go();
-    ytApiQ.push(go);
-    if (ytApiState === 0) {
-      ytApiState = 1; window.onYouTubeIframeAPIReady = function () { ytApiState = 2; ytApiQ.forEach(function (f) { f(); }); ytApiQ = []; };
-      var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
-    }
-  }
   function renderHomeYt() {
     if (playing) return;
-    var box = $('#homeYt'), r = S.ytRecent.filter(function (x) { return ytId(x.url); })[0] || S.ytRecent[0], id = r && ytId(r.url);
-    if (!r) { box.innerHTML = '<div class="muted">Busque um vídeo ou cole um link. Abre direto no YouTube (Premium, sem anúncios).</div>'; box.onclick = function () { show('yt'); }; return; }
-    box.innerHTML = (id ? '<img src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg"><span class="playbtn">' + ic('play') + '</span>' : '<div class="yt-ph">' + ic('youtube') + '</div>') + '<b>' + esc(r.q) + '</b>';
-    box.onclick = function () { playVideo(r.url); };
+    var box = $('#homeYt');
+    box.innerHTML = '<div class="muted">Busque um vídeo ou uma live na aba YouTube.</div>';
+    box.onclick = function () { show('yt'); };
   }
   $('#goYt').onclick = function () { show('yt'); };
   $('#goRadio').onclick = function () { show('music'); };
   $('#btnExpand').onclick = function () { show(current === 'map' ? 'home' : 'map'); };
-  function renderYtRecent() {
-    var box = $('#ytRecent'); box.innerHTML = '';
-    if (!S.ytRecent.length) { box.innerHTML = '<div class="muted">Nada ainda.</div>'; return; }
-    S.ytRecent.forEach(function (r) {
-      var id = ytId(r.url), el = document.createElement('div'); el.className = 'item';
-      el.innerHTML = (id ? '<img src="https://i.ytimg.com/vi/' + id + '/default.jpg">' : '<div class="ph"></div>') + '<div class="t"><b>' + esc(r.q) + '</b><span>' + esc(r.url) + '</span></div>';
-      el.onclick = function () { playVideo(r.url); }; box.appendChild(el);
-    });
-  }
-
   /* ---------- busca + player via Piped (teste: sem anuncios, sem login Google) ---------- */
   var PIPED = [['https://api.piped.private.coffee', 'https://piped.private.coffee'], ['https://pipedapi.kavin.rocks', 'https://piped.video']];
   function pdFetch(path, ms) {
@@ -762,134 +707,6 @@
   $('#pdGo').onclick = function () { pdSearch($('#pdQ').value); };
   $('#pdQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') pdSearch(this.value); });
 
-  /* ---------- conta Google / YouTube (OAuth via Google Identity Services) ---------- */
-  var G_SCOPE = 'https://www.googleapis.com/auth/youtube.readonly';
-  var gisPromise = null, tokenClient = null, ytTab = 'playlists', ytStack = [];
-  function gValid() { return S.gTok && S.gTok.exp > Date.now() + 30000; }
-  function loadGis() {
-    if (window.google && google.accounts && google.accounts.oauth2) return Promise.resolve();
-    if (gisPromise) return gisPromise;
-    gisPromise = new Promise(function (ok, fail) {
-      var s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.async = true;
-      s.onload = ok; s.onerror = function () { gisPromise = null; fail(new Error('gis')); }; document.head.appendChild(s);
-    });
-    return gisPromise;
-  }
-  function gToken(interactive) { // devolve um token válido (pede ao Google se preciso)
-    if (gValid()) return Promise.resolve(S.gTok.t);
-    if (!S.gClientId) return Promise.reject(new Error('noid'));
-    return loadGis().then(function () {
-      return new Promise(function (ok, fail) {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: S.gClientId, scope: G_SCOPE,
-          callback: function (r) {
-            if (r.error) { fail(new Error(r.error)); return; }
-            S.gTok = { t: r.access_token, exp: Date.now() + (parseInt(r.expires_in, 10) || 3600) * 1000 }; save(); ok(r.access_token);
-          },
-          error_callback: function (e) { fail(new Error((e && e.type) || 'popup')); }
-        });
-        tokenClient.requestAccessToken({ prompt: interactive ? 'select_account' : '' });
-      });
-    });
-  }
-  function ytApi(path, params) {
-    return gToken(false).then(function (tok) {
-      var q = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-      return fetch('https://www.googleapis.com/youtube/v3/' + path + '?' + q, { headers: { Authorization: 'Bearer ' + tok } }).then(function (r) {
-        if (r.status === 401) { S.gTok = null; save(); renderYtAccount(); throw new Error('Sessão expirada. Entre de novo.'); }
-        return r.json().then(function (j) { if (j.error) throw new Error(j.error.message || 'Erro da API do YouTube'); return j; });
-      });
-    });
-  }
-  function thumb(sn) { var t = sn.thumbnails || {}; return (t.medium || t.default || t.high || {}).url || ''; }
-  function ytItem(o) {
-    var el = document.createElement('div'); el.className = 'item';
-    el.innerHTML = (o.img ? '<img src="' + esc(o.img) + '" loading="lazy">' : '<div class="ph"></div>') + '<div class="t"><b>' + esc(o.title) + '</b><span>' + esc(o.sub || '') + '</span></div>';
-    el.onclick = o.fn; return el;
-  }
-  function openYt(url, label) {
-    S.ytRecent = [{ q: label, url: url, t: Date.now() }].concat(S.ytRecent.filter(function (r) { return r.url !== url; })).slice(0, 10); save();
-    renderYtRecent(); renderHomeYt(); playVideo(url);
-  }
-  function ytList(items, title, back) {
-    var box = $('#ytItems'); box.innerHTML = ''; $('#ytTitle').textContent = title || '';
-    $('#ytBack').classList.toggle('hidden', !back);
-    if (!items.length) box.innerHTML = '<div class="muted">Nada por aqui.</div>';
-    items.forEach(function (o) { box.appendChild(ytItem(o)); });
-  }
-  function ytLoading(msg) { $('#ytItems').innerHTML = '<div class="muted">' + esc(msg || 'Carregando…') + '</div>'; }
-  function ytFail(e) { $('#ytItems').innerHTML = '<div class="muted">' + esc(e.message === 'noid' ? 'Configure o ID do cliente nos ajustes.' : e.message) + '</div>'; }
-  function videoItem(v, listId) {
-    var sn = v.snippet, id = (sn.resourceId && sn.resourceId.videoId) || (v.id && v.id.videoId) || v.id;
-    return { img: thumb(sn), title: sn.title, sub: sn.videoOwnerChannelTitle || sn.channelTitle || '',
-      fn: function () { openYt('https://www.youtube.com/watch?v=' + id + (listId ? '&list=' + listId : ''), sn.title); } };
-  }
-  function ytShowPlaylist(id, name) {
-    ytStack.push(ytTab); ytLoading();
-    ytApi('playlistItems', { part: 'snippet', playlistId: id, maxResults: 50 }).then(function (j) {
-      ytList(j.items.filter(function (v) { return v.snippet.title !== 'Private video' && v.snippet.title !== 'Deleted video'; })
-        .map(function (v) { return videoItem(v, id); }), name, true);
-    }).catch(ytFail);
-  }
-  function ytLoadTab() {
-    ytStack = []; ytLoading();
-    if (ytTab === 'playlists') {
-      ytApi('playlists', { part: 'snippet', mine: 'true', maxResults: 50 }).then(function (j) {
-        ytList(j.items.map(function (p) { return { img: thumb(p.snippet), title: p.snippet.title, sub: 'Playlist', fn: function () { ytShowPlaylist(p.id, p.snippet.title); } }; }), 'Suas playlists');
-      }).catch(ytFail);
-    } else if (ytTab === 'liked') {
-      ytApi('playlistItems', { part: 'snippet', playlistId: 'LL', maxResults: 50 }).then(function (j) {
-        ytList(j.items.map(function (v) { return videoItem(v, 'LL'); }), 'Vídeos que você curtiu');
-      }).catch(ytFail);
-    } else if (ytTab === 'subs') {
-      ytApi('subscriptions', { part: 'snippet', mine: 'true', maxResults: 50, order: 'alphabetical' }).then(function (j) {
-        ytList(j.items.map(function (s) { var cid = s.snippet.resourceId.channelId;
-          return { img: thumb(s.snippet), title: s.snippet.title, sub: 'Canal', fn: function () { openYt('https://www.youtube.com/channel/' + cid, s.snippet.title); } }; }), 'Suas inscrições');
-      }).catch(ytFail);
-    }
-  }
-  var YTTABS = [['playlists', 'Playlists'], ['liked', 'Curtidos'], ['subs', 'Inscrições']];
-  function renderYtAccount() {
-    var on = gValid();
-    $('#ytLoginMsg').textContent = on ? 'Conectado. Toque em um vídeo para abrir no YouTube.' :
-      (S.gClientId ? 'Entre com o Google para ver suas playlists, vídeos curtidos e inscrições.' : 'Primeiro configure o ID do cliente Google (veja Ajustes → Google / YouTube).');
-    $('#ytSignIn').classList.toggle('hidden', on); $('#ytSignOut').classList.toggle('hidden', !on);
-    $('#ytAccount').classList.toggle('hidden', !on);
-    if (!on) return;
-    var tabs = $('#ytTabs'); tabs.innerHTML = '';
-    YTTABS.forEach(function (t) {
-      var el = document.createElement('span'); el.className = 'chip' + (t[0] === ytTab ? ' on' : ''); el.textContent = t[1];
-      el.onclick = function () { ytTab = t[0]; renderYtAccount(); ytLoadTab(); }; tabs.appendChild(el);
-    });
-  }
-  $('#ytSignIn').onclick = function () {
-    if (!S.gClientId) { show('settings'); toast('Cole o ID do cliente Google primeiro.', true); return; }
-    gToken(true).then(function () { renderYtAccount(); ytLoadTab(); })
-      .catch(function (e) { toast(e.message === 'gis' ? 'Não consegui carregar o login do Google.' : 'Login cancelado ou bloqueado (' + e.message + ').', true, 5000); });
-  };
-  $('#ytSignOut').onclick = function () {
-    var t = S.gTok && S.gTok.t; S.gTok = null; save();
-    if (t && window.google && google.accounts) try { google.accounts.oauth2.revoke(t, function () {}); } catch (e) {}
-    renderYtAccount();
-  };
-  $('#ytSetup').onclick = function () { show('settings'); setTimeout(function () { var c = $('#googleCard'); if (c.scrollIntoView) c.scrollIntoView(); }, 50); };
-  $('#ytBack').onclick = function () { ytTab = ytStack.pop() || ytTab; ytLoadTab(); };
-  $('#gSave').onclick = function () {
-    var v = $('#gClientId').value.trim();
-    if (v && !/\.apps\.googleusercontent\.com$/.test(v)) { toast('O ID deve terminar com .apps.googleusercontent.com', true, 4500); return; }
-    S.gClientId = v; S.gTok = null; save(); toast(v ? 'ID salvo.' : 'ID removido.');
-  };
-  // pesquisa na API quando conectado (a pesquisa por texto usa a cota da sua chave)
-  var ytOpenBase = ytOpen;
-  ytOpen = function (q) {
-    q = q.trim();
-    if (!q || ytId(q) || /^https?:\/\//.test(q) || !gValid()) { ytOpenBase(q); return; }
-    $('#ytAccount').classList.remove('hidden'); ytLoading('Buscando…'); ytStack = [];
-    ytApi('search', { part: 'snippet', type: 'video', maxResults: 20, q: q }).then(function (j) {
-      ytList(j.items.map(function (v) { return videoItem(v); }), 'Resultados para “' + q + '”');
-    }).catch(ytFail);
-  };
-
   /* ---------- ajustes ---------- */
   function normPhone(p) { return String(p).replace(/\D/g, ''); }
   function renderContacts() {
@@ -971,7 +788,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 30;
+  var APP_V = 31;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
@@ -992,8 +809,7 @@
     $$('input[name=locMode]').forEach(function (r) { r.checked = r.value === S.locMode; });
     $('#bridgeBox').classList.toggle('hidden', S.locMode !== 'iphone');
     $('#topicField').value = S.topic + '-ipad'; $('#topicIn').textContent = S.topic + '-ipad';
-    $('#cityField').value = S.city; $('#navApp').value = S.nav; $('#voiceOn').checked = !!S.voice; $('#mph').checked = !!S.mph; $('#ytMode').value = S.ytMode; $('#mbToken').value = S.mbToken || '';
-    $('#gClientId').value = S.gClientId || ''; $('#originCode').textContent = location.origin;
+    $('#cityField').value = S.city; $('#navApp').value = S.nav; $('#voiceOn').checked = !!S.voice; $('#mph').checked = !!S.mph; $('#mbToken').value = S.mbToken || '';
     renderContacts();
   }
   $$('input[name=locMode]').forEach(function (r) { r.onchange = function () { S.locMode = r.value; save(); applyLocMode(); renderSettings(); }; });
@@ -1006,7 +822,6 @@
     if (t && t.indexOf('pk.') !== 0) { toast('O token público do Mapbox começa com pk.', true); return; }
     S.mbToken = t; save(); toast(t ? 'Token salvo. Recarregando…' : 'Token removido. Recarregando…'); setTimeout(function () { location.reload(); }, 700);
   };
-  $('#ytMode').onchange = function () { S.ytMode = this.value; save(); };
   $('#voiceOn').onchange = function () { S.voice = this.checked; save(); };
   $('#mph').onchange = function () { S.mph = this.checked; lastWx = 0; save(); weather(); };
 

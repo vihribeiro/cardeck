@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=30">
+<link rel="stylesheet" href="css/app.css?v=31">
 </head>
 <body>
 <div id="app">
@@ -121,7 +121,7 @@
     <section id="v-yt" class="view">
       <h2>YouTube</h2>
       <div class="card" id="pdCard">
-        <h3>Buscar vídeos (teste sem anúncios)</h3>
+        <h3>Buscar vídeos</h3>
         <div class="searchbar">
           <input id="pdQ" type="search" placeholder="Pesquisar no YouTube" autocomplete="off" autocorrect="off">
           <button id="pdGo" class="btn primary">Buscar</button>
@@ -131,34 +131,6 @@
         <div id="pdStatus" class="muted small"></div>
         <div id="pdRes" class="list" style="margin-top:8px"></div>
       </div>
-      <div class="card">
-        <p class="muted">Quem tem <b>YouTube Premium</b> assiste sem anúncios abrindo direto no YouTube (ele usa o seu login do Safari). Cole um link ou digite uma busca.</p>
-        <div class="searchbar">
-          <input id="ytQ" type="search" placeholder="Link do vídeo ou busca" autocomplete="off" autocorrect="off">
-          <button id="ytGo" class="btn primary">Abrir</button>
-        </div>
-        <div id="ytPlayer"></div>
-        <div class="row">
-          <a class="btn" id="ytHome" href="https://www.youtube.com/" target="_blank" rel="noopener">Abrir YouTube</a>
-          <a class="btn" id="ytMusic" href="https://music.youtube.com/" target="_blank" rel="noopener">Abrir YouTube Music</a>
-        </div>
-      </div>
-      <div id="ytLogin" class="card">
-        <b>Sua conta do YouTube</b>
-        <p class="muted small" id="ytLoginMsg">Entre com o Google para ver suas playlists, vídeos curtidos e inscrições. Os vídeos abrem no YouTube, então o Premium continua sem anúncios.</p>
-        <div class="row">
-          <button id="ytSignIn" class="btn primary">Entrar com Google</button>
-          <button id="ytSignOut" class="btn hidden">Sair</button>
-          <button id="ytSetup" class="btn">Configurar</button>
-        </div>
-      </div>
-      <div id="ytAccount" class="hidden">
-        <div class="chips" id="ytTabs"></div>
-        <div class="row" style="margin:0 0 10px"><button id="ytBack" class="btn hidden"><i class="ic" data-ic="arrow-left"></i> Voltar</button><span id="ytTitle" class="muted"></span></div>
-        <div id="ytItems" class="list"></div>
-      </div>
-      <h3>Recentes</h3>
-      <div id="ytRecent" class="list"></div>
     </section>
 
     <!-- AJUSTES -->
@@ -205,11 +177,6 @@
             <option value="google">Google Maps</option>
             <option value="apple">Apple Maps</option>
           </select></label>
-        <label class="opt">Ao tocar num vídeo
-          <select id="ytMode">
-            <option value="embed">Tocar aqui no painel (pode ter anúncios)</option>
-            <option value="app">Abrir no YouTube (Premium, sem anúncios)</option>
-          </select></label>
         <label class="opt"><input type="checkbox" id="voiceOn"> Instruções por voz</label>
         <label class="opt"><input type="checkbox" id="mph"> Milhas / mph</label>
       </div>
@@ -220,15 +187,6 @@
         <div class="row">
           <input id="mbToken" placeholder="pk.eyJ1Ijoi…" autocapitalize="off" autocorrect="off" style="flex:1">
           <button id="mbSave" class="btn">Salvar</button>
-        </div>
-      </div>
-
-      <div class="card" id="googleCard">
-        <h3>Google / YouTube</h3>
-        <p class="muted small">Cole o <b>ID do cliente OAuth</b> criado no Google Cloud (tipo “Aplicativo da Web”, com esta origem autorizada: <code id="originCode"></code>). Ele fica só neste iPad.</p>
-        <div class="row">
-          <input id="gClientId" placeholder="123456-abc.apps.googleusercontent.com" autocapitalize="off" autocorrect="off" style="flex:1">
-          <button id="gSave" class="btn">Salvar</button>
         </div>
       </div>
 
@@ -259,10 +217,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v30</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v31</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=30"></script>
+<script src="js/app.js?v=31"></script>
 </body>
 </html>
