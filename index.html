@@ -14,11 +14,12 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=12">
+<link rel="stylesheet" href="css/app.css?v=13">
 </head>
 <body>
 <div id="app">
   <nav id="dock">
+    <div id="brandLogo" class="hidden"></div>
     <button data-view="home" class="on" aria-label="Início"><i class="ic" data-ic="home"></i><span>Início</span></button>
     <button data-view="map" aria-label="Mapa"><i class="ic" data-ic="compass"></i><span>Mapa</span></button>
     <button data-view="music" aria-label="Música"><i class="ic" data-ic="music"></i><span>Música</span></button>
@@ -152,6 +153,19 @@
     <section id="v-settings" class="view">
       <h2>Ajustes</h2>
 
+      <div class="card" id="themeCard">
+        <h3>Personalização</h3>
+        <div class="muted small">Cor de destaque (combine com o painel do carro)</div>
+        <div class="swatches" id="accSw"></div>
+        <div class="opt"><input type="color" id="accPick" aria-label="Escolher cor"><input type="range" id="accHue" class="hue" min="0" max="360" aria-label="Matiz"></div>
+        <div class="muted small" style="margin-top:8px">Fundo</div>
+        <div class="chips" id="bgChips" style="margin-top:8px"></div>
+        <div class="muted small">Logo da marca (canto superior esquerdo)</div>
+        <div class="opt"><select id="brandSel"></select></div>
+        <div class="row" style="margin-top:0"><label class="btn"><i class="ic" data-ic="plus"></i> Enviar minha logo<input type="file" id="brandFile" accept="image/*" hidden></label><button class="btn" id="brandClear">Remover logo</button></div>
+        <p class="muted small">As opções da lista são emblemas com a sigla da marca (não incluo as logos oficiais por serem marcas registradas). Para usar a logo real, envie o arquivo da imagem.</p>
+      </div>
+
       <div class="card">
         <h3>Localização</h3>
         <label class="opt"><input type="radio" name="locMode" value="gps"> Este iPad tem GPS (modelo 4G/celular)</label>
@@ -230,10 +244,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v12</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v13</div>
 <audio id="audio" playsinline webkit-playsinline></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=12"></script>
+<script src="js/app.js?v=13"></script>
 </body>
 </html>

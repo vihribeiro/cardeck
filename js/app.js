@@ -764,7 +764,68 @@
     if (!n || normPhone(p).length < 8) { toast('Informe nome e telefone.', true); return; }
     S.contacts.push({ name: n, phone: p }); save(); $('#ctName').value = ''; $('#ctPhone').value = ''; renderContacts();
   };
+
+  /* ---------- personalização: cores e logo da marca ---------- */
+  var BGS = { escuro: ['#0b0d12', '#161a22', '#1e2430', '#2a3140', 'Escuro'], grafite: ['#15171a', '#202327', '#2a2e34', '#3a3f47', 'Grafite'],
+    noite: ['#070b17', '#0f1830', '#16224a', '#233463', 'Azul-noite'], preto: ['#000000', '#0c0c0e', '#17171a', '#26262b', 'Preto'], vinho: ['#120a0d', '#1f1115', '#2b181e', '#42242d', 'Vinho'] };
+  var ACCS = ['#3b82f6', '#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#8b5cf6', '#ec4899', '#e5e7eb'];
+  var BRANDS = [['audi', 'Audi', 'AUDI'], ['bmw', 'BMW', 'BMW'], ['byd', 'BYD', 'BYD'], ['chevrolet', 'Chevrolet', 'CHEV'], ['citroen', 'Citroën', 'C'], ['fiat', 'Fiat', 'FIAT'],
+    ['ford', 'Ford', 'FORD'], ['honda', 'Honda', 'H'], ['hyundai', 'Hyundai', 'HY'], ['jeep', 'Jeep', 'JEEP'], ['kia', 'Kia', 'KIA'], ['mercedes', 'Mercedes-Benz', 'MB'],
+    ['mitsubishi', 'Mitsubishi', 'MIT'], ['nissan', 'Nissan', 'NIS'], ['peugeot', 'Peugeot', 'PEU'], ['renault', 'Renault', 'REN'], ['tesla', 'Tesla', 'T'],
+    ['toyota', 'Toyota', 'TOY'], ['volkswagen', 'Volkswagen', 'VW'], ['volvo', 'Volvo', 'VOL']];
+  S.theme = S.theme || { acc: '#3b82f6', bg: 'escuro' }; S.brand = S.brand || { id: '', img: '' };
+  function hexLum(h) { var n = parseInt(h.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b) / 255; }
+  function hsl2hex(h, s, l) {
+    s /= 100; l /= 100; var a = s * Math.min(l, 1 - l);
+    function f(n) { var k = (n + h / 30) % 12, c = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return ('0' + Math.round(255 * c).toString(16)).slice(-2); }
+    return '#' + f(0) + f(8) + f(4);
+  }
+  function applyTheme() {
+    var st = document.documentElement.style, t = S.theme, b = BGS[t.bg] || BGS.escuro;
+    st.setProperty('--acc', t.acc); st.setProperty('--on', hexLum(t.acc) > 0.6 ? '#111' : '#fff');
+    st.setProperty('--bg', b[0]); st.setProperty('--card', b[1]); st.setProperty('--card2', b[2]); st.setProperty('--line', b[3]); st.setProperty('--dockbg', b[0]);
+    var el = $('#brandLogo'), br = S.brand, h = '';
+    if (br.img) h = '<img src="' + br.img + '" alt="">';
+    else if (br.id) { var bb = BRANDS.filter(function (x) { return x[0] === br.id; })[0]; if (bb) h = '<span class="bmk l' + Math.min(bb[2].length, 4) + '">' + esc(bb[2]) + '</span>'; }
+    el.innerHTML = h; el.classList.toggle('hidden', !h); $('#dock').classList.toggle('hasLogo', !!h);
+  }
+  function setAcc(hex) { S.theme.acc = hex; save(); applyTheme(); $('#accPick').value = hex; renderThemeUi(); }
+  function renderThemeUi() {
+    $('#accSw').innerHTML = ACCS.map(function (c) { return '<button class="sw' + (c === S.theme.acc ? ' on' : '') + '" data-c="' + c + '" style="background:' + c + '" aria-label="' + c + '"></button>'; }).join('');
+    $('#bgChips').innerHTML = Object.keys(BGS).map(function (k) { return '<span class="chip' + (S.theme.bg === k ? ' on' : '') + '" data-bg="' + k + '">' + BGS[k][4] + '</span>'; }).join('');
+    $('#accPick').value = S.theme.acc;
+    var sel = $('#brandSel'); if (!sel.options.length) {
+      sel.innerHTML = '<option value="">Nenhuma</option>' + BRANDS.map(function (b) { return '<option value="' + b[0] + '">' + b[1] + '</option>'; }).join('') + '<option value="custom" disabled>Minha logo (enviada)</option>';
+    }
+    sel.value = S.brand.img ? 'custom' : S.brand.id;
+  }
+  $('#accSw').onclick = function (e) { var b = e.target.closest ? e.target.closest('.sw') : null; if (b) setAcc(b.dataset.c); };
+  $('#bgChips').onclick = function (e) { var b = e.target.closest ? e.target.closest('.chip') : null; if (b) { S.theme.bg = b.dataset.bg; save(); applyTheme(); renderThemeUi(); } };
+  $('#accPick').oninput = function () { S.theme.acc = this.value; save(); applyTheme(); };
+  $('#accPick').onchange = renderThemeUi;
+  $('#accHue').oninput = function () { S.theme.acc = hsl2hex(+this.value, 85, 55); save(); applyTheme(); $('#accPick').value = S.theme.acc; };
+  $('#accHue').onchange = renderThemeUi;
+  $('#brandSel').onchange = function () { S.brand = { id: this.value, img: '' }; save(); applyTheme(); };
+  $('#brandClear').onclick = function () { S.brand = { id: '', img: '' }; save(); applyTheme(); renderThemeUi(); };
+  $('#brandFile').onchange = function () {
+    var f = this.files && this.files[0]; if (!f) return; var self = this;
+    var rd = new FileReader();
+    rd.onload = function () {
+      var im = new Image();
+      im.onload = function () {
+        var m = 160, k = Math.min(1, m / Math.max(im.width, im.height)), cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(im.width * k)); cv.height = Math.max(1, Math.round(im.height * k));
+        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+        S.brand = { id: 'custom', img: cv.toDataURL('image/png') }; save(); applyTheme(); renderThemeUi(); self.value = '';
+      };
+      im.onerror = function () { toast('Não consegui abrir essa imagem.', true); };
+      im.src = rd.result;
+    };
+    rd.readAsDataURL(f);
+  };
+  applyTheme(); renderThemeUi();
   function renderSettings() {
+    renderThemeUi();
     $$('input[name=locMode]').forEach(function (r) { r.checked = r.value === S.locMode; });
     $('#bridgeBox').classList.toggle('hidden', S.locMode !== 'iphone');
     $('#topicField').value = S.topic + '-ipad'; $('#topicIn').textContent = S.topic + '-ipad';
