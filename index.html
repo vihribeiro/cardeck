@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>CarDeck</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CarDeck">
+<meta name="theme-color" content="#0b0d12">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="leaflet/leaflet.css">
+<link rel="stylesheet" href="mapbox/mapbox-gl.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+  <nav id="dock">
+    <button data-view="home" class="on" aria-label="Início"><i class="ic" data-ic="home"></i><span>Início</span></button>
+    <button data-view="map" aria-label="Mapa"><i class="ic" data-ic="compass"></i><span>Mapa</span></button>
+    <button data-view="music" aria-label="Música"><i class="ic" data-ic="music"></i><span>Música</span></button>
+    <button data-view="yt" aria-label="YouTube"><i class="ic" data-ic="youtube"></i><span>YouTube</span></button>
+    <button data-view="settings" aria-label="Ajustes"><i class="ic" data-ic="sliders"></i><span>Ajustes</span></button>
+  </nav>
+
+  <main>
+    <!-- INÍCIO: mapa grande + música + YouTube -->
+    <section id="v-home" class="view on">
+      <div class="dash">
+        <div id="mapWrap" class="mapcard">
+          <div id="map"></div>
+          <div class="hud hud-l">
+            <div id="greet" class="greet"></div>
+            <div id="clock" class="clock">--:--</div>
+            <div id="date" class="muted"></div>
+          </div>
+          <div class="hud hud-r">
+            <div id="locStatus" class="pill muted">Sem localização</div>
+            <div id="wx" class="pill muted">Clima…</div>
+            <div id="netStatus" class="pill muted"></div>
+          </div>
+          <div class="map-search">
+            <input id="mapQ" type="search" placeholder="Para onde vamos?" autocomplete="off" autocorrect="off">
+            <button id="mapGo" class="btn primary">Ir</button>
+          </div>
+          <div id="mapResults" class="results floating"></div>
+          <div id="favs" class="favstrip"></div>
+          <div id="mapctl" class="mapctl hidden"><button data-ctl="style" aria-label="Satélite"><i class="ic" data-ic="globe"></i></button><button data-ctl="traffic" aria-label="Trânsito"><i class="ic" data-ic="traffic"></i></button><button data-ctl="d3" aria-label="Prédios 3D"><i class="ic" data-ic="building"></i></button></div>
+          <button id="recenter" class="fab fab-b" aria-label="Centralizar"><i class="ic" data-ic="locate"></i></button>
+          <button id="btnExpand" class="fab fab-b2" aria-label="Tela cheia"><i class="ic" data-ic="maximize"></i></button>
+
+          <div id="placePanel" class="panel hidden">
+            <div id="placeName" class="panel-title"></div>
+            <div id="placeInfo" class="muted"></div>
+            <div class="row">
+              <button id="btnRoute" class="btn primary">Traçar rota</button>
+              <button id="btnFav" class="btn"><i class="ic" data-ic="star"></i> Favoritar</button>
+              <button id="btnPhone" class="btn">Abrir no app…</button>
+              <button id="btnClosePlace" class="btn">Fechar</button>
+            </div>
+          </div>
+
+          <div id="navPanel" class="panel hidden">
+            <div class="nav-main">
+              <div id="navArrow" class="nav-arrow"><i class="ic" data-ic="arrow-up"></i></div>
+              <div>
+                <div id="navDist" class="nav-dist">—</div>
+                <div id="navText" class="nav-text"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div id="navEta" class="muted grow"></div>
+              <button id="btnStartNav" class="btn primary">Iniciar</button>
+              <button id="btnMute" class="btn"><i class="ic" data-ic="volume"></i></button>
+              <button id="btnEndNav" class="btn danger">Encerrar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="card">
+            <h3>Música</h3>
+            <div class="appgrid">
+              <a href="spotify://"><i style="background:#1db954"><i class="ic" data-ic="music"></i></i>Spotify</a>
+              <a href="music://"><i style="background:#fa2d48"><i class="ic" data-ic="music"></i></i>Apple Music</a>
+              <a href="youtubemusic://"><i style="background:#e00"><i class="ic" data-ic="music"></i></i>YouTube Music</a>
+              <a href="deezer://"><i style="background:#a238ff"><i class="ic" data-ic="music"></i></i>Deezer</a>
+            </div>
+            <div id="homeNP" class="muted small" style="margin:10px 0 0">Nada tocando</div>
+            <button id="goRadio" class="btn block"><i class="ic" data-ic="radio"></i> Rádios no iPad</button>
+          </div>
+          <div class="card ytcard">
+            <div class="row" style="margin:0 0 10px"><h3 style="margin:0;color:#ff4d4d;flex:1"><i class="ic" data-ic="youtube"></i> YouTube</h3><button id="goYt" class="btn"><i class="ic" data-ic="search"></i> Buscar</button></div>
+            <div id="homeYt" class="homeyt"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÚSICA -->
+    <section id="v-music" class="view">
+      <h2>Música</h2>
+      <div class="chips" id="musicApps">
+        <a class="chip" href="spotify://" >Spotify</a>
+        <a class="chip" href="music://">Apple Music</a>
+        <a class="chip" href="youtubemusic://">YouTube Music</a>
+        <a class="chip" href="deezer://">Deezer</a>
+      </div>
+      <h3>Rádios</h3>
+      <div class="chips" id="radioChips"></div>
+      <div id="radioList" class="list"></div>
+    </section>
+
+    <!-- YOUTUBE -->
+    <section id="v-yt" class="view">
+      <h2>YouTube</h2>
+      <div class="card">
+        <p class="muted">Quem tem <b>YouTube Premium</b> assiste sem anúncios abrindo direto no YouTube (ele usa o seu login do Safari). Cole um link ou digite uma busca.</p>
+        <div class="searchbar">
+          <input id="ytQ" type="search" placeholder="Link do vídeo ou busca" autocomplete="off" autocorrect="off">
+          <button id="ytGo" class="btn primary">Abrir</button>
+        </div>
+        <div class="row">
+          <a class="btn" id="ytHome" href="https://www.youtube.com/" target="_blank" rel="noopener">Abrir YouTube</a>
+          <a class="btn" id="ytMusic" href="https://music.youtube.com/" target="_blank" rel="noopener">Abrir YouTube Music</a>
+        </div>
+      </div>
+      <div id="ytLogin" class="card">
+        <b>Sua conta do YouTube</b>
+        <p class="muted small" id="ytLoginMsg">Entre com o Google para ver suas playlists, vídeos curtidos e inscrições. Os vídeos abrem no YouTube, então o Premium continua sem anúncios.</p>
+        <div class="row">
+          <button id="ytSignIn" class="btn primary">Entrar com Google</button>
+          <button id="ytSignOut" class="btn hidden">Sair</button>
+          <button id="ytSetup" class="btn">Configurar</button>
+        </div>
+      </div>
+      <div id="ytAccount" class="hidden">
+        <div class="chips" id="ytTabs"></div>
+        <div class="row" style="margin:0 0 10px"><button id="ytBack" class="btn hidden"><i class="ic" data-ic="arrow-left"></i> Voltar</button><span id="ytTitle" class="muted"></span></div>
+        <div id="ytItems" class="list"></div>
+      </div>
+      <h3>Recentes</h3>
+      <div id="ytRecent" class="list"></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section id="v-settings" class="view">
+      <h2>Ajustes</h2>
+
+      <div class="card">
+        <h3>Localização</h3>
+        <label class="opt"><input type="radio" name="locMode" value="gps"> Este iPad tem GPS (modelo 4G/celular)</label>
+        <label class="opt"><input type="radio" name="locMode" value="iphone"> Usar a localização do iPhone (iPad só Wi-Fi)</label>
+        <div id="bridgeBox" class="hidden">
+          <p class="muted small">No iPhone, instale o app <b>ntfy</b> e assine o tópico abaixo. Crie um Atalho que publique <code>loc: LAT,LON</code> no tópico <code id="topicIn"></code>.</p>
+          <div class="row">
+            <input id="topicField" readonly>
+            <button id="btnCopyTopic" class="btn">Copiar</button>
+            <button id="btnNewTopic" class="btn">Gerar novo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Preferências</h3>
+        <label class="opt">Cidade (clima sem GPS)
+          <input id="cityField" placeholder="Ex.: São Paulo"></label>
+        <label class="opt">App de navegação para “Abrir no app”
+          <select id="navApp">
+            <option value="waze">Waze</option>
+            <option value="google">Google Maps</option>
+            <option value="apple">Apple Maps</option>
+          </select></label>
+        <label class="opt">Ao tocar num vídeo
+          <select id="ytMode">
+            <option value="embed">Tocar aqui no painel (pode ter anúncios)</option>
+            <option value="app">Abrir no YouTube (Premium, sem anúncios)</option>
+          </select></label>
+        <label class="opt"><input type="checkbox" id="voiceOn"> Instruções por voz</label>
+        <label class="opt"><input type="checkbox" id="mph"> Milhas / mph</label>
+      </div>
+
+      <div class="card" id="mapboxCard">
+        <h3>Mapa: satélite, trânsito e 3D (Mapbox)</h3>
+        <p class="muted small">Cole o <b>token público</b> do Mapbox (começa com <code>pk.</code>). Sem token, o app usa o mapa simples do OpenStreetMap. Fica só neste iPad.</p>
+        <div class="row">
+          <input id="mbToken" placeholder="pk.eyJ1Ijoi…" autocapitalize="off" autocorrect="off" style="flex:1">
+          <button id="mbSave" class="btn">Salvar</button>
+        </div>
+      </div>
+
+      <div class="card" id="googleCard">
+        <h3>Google / YouTube</h3>
+        <p class="muted small">Cole o <b>ID do cliente OAuth</b> criado no Google Cloud (tipo “Aplicativo da Web”, com esta origem autorizada: <code id="originCode"></code>). Ele fica só neste iPad.</p>
+        <div class="row">
+          <input id="gClientId" placeholder="123456-abc.apps.googleusercontent.com" autocapitalize="off" autocorrect="off" style="flex:1">
+          <button id="gSave" class="btn">Salvar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Contatos rápidos</h3>
+        <div id="contacts" class="list"></div>
+        <div class="row">
+          <input id="ctName" placeholder="Nome">
+          <input id="ctPhone" placeholder="Telefone com DDD" inputmode="tel">
+          <button id="ctAdd" class="btn">Adicionar</button>
+        </div>
+      </div>
+
+      <p class="muted small"><i class="ic" data-ic="alert"></i> Segurança em primeiro lugar: prenda o iPad em um suporte, configure tudo com o carro parado e respeite as leis de trânsito.</p>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<div id="onboard" class="modal hidden">
+  <div class="modal-card">
+    <h2>Bem-vindo ao CarDeck</h2>
+    <p class="muted">Seu painel de carro no iPad. Primeiro, como este iPad se conecta?</p>
+    <button class="btn primary block" data-mode="gps">Tem 4G / GPS próprio</button>
+    <button class="btn block" data-mode="iphone">Só Wi-Fi (uso o Acesso Pessoal do iPhone)</button>
+    <p class="muted small"><i class="ic" data-ic="alert"></i> Prenda o iPad em um suporte firme, configure tudo com o carro parado e não mexa na tela dirigindo. Respeite as leis de trânsito.</p>
+  </div>
+</div>
+
+<audio id="audio" preload="none"></audio>
+<script src="leaflet/leaflet.js"></script>
+<script src="mapbox/mapbox-gl.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
