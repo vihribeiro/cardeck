@@ -488,12 +488,13 @@
   var playing = null;
   function playVideo(url) {
     var id = ytId(url);
-    if (S.ytMode === 'embed' && id) {
-      playing = id; show('home');
-      var box = $('#homeYt'); box.onclick = null;
-      box.innerHTML = '<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>' +
-        '<div class="row"><a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir no YouTube</a><button class="btn" id="closePl">Fechar</button></div>';
-      $('#closePl').onclick = function (e) { e.stopPropagation(); playing = null; renderHomeYt(); };
+    if (S.ytMode !== 'app' && id) {
+      playing = id; if (current !== 'yt') show('home');
+      var html = '<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/' + id + '?playsinline=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
+        '<div class="row"><a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir no YouTube</a><button class="btn closePl">Fechar</button></div>';
+      var box = $('#homeYt'); box.onclick = null; box.innerHTML = html;
+      $('#ytPlayer').innerHTML = html;
+      $$('.closePl').forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); playing = null; $('#ytPlayer').innerHTML = ''; renderHomeYt(); }; });
     } else window.open(url, '_blank');
   }
   function renderHomeYt() {

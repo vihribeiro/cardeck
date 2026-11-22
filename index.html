@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=4">
+<link rel="stylesheet" href="css/app.css?v=5">
 </head>
 <body>
 <div id="app">
@@ -123,6 +123,7 @@
           <input id="ytQ" type="search" placeholder="Link do vídeo ou busca" autocomplete="off" autocorrect="off">
           <button id="ytGo" class="btn primary">Abrir</button>
         </div>
+        <div id="ytPlayer"></div>
         <div class="row">
           <a class="btn" id="ytHome" href="https://www.youtube.com/" target="_blank" rel="noopener">Abrir YouTube</a>
           <a class="btn" id="ytMusic" href="https://music.youtube.com/" target="_blank" rel="noopener">Abrir YouTube Music</a>
@@ -228,10 +229,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v4</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v5</div>
 <audio id="audio" preload="none"></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=4"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>
