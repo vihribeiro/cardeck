@@ -590,7 +590,6 @@
   var playing = null;
   function playVideo(url) {
     var id = ytId(url), lm = !id && String(url).match(/[?&]list=([\w-]+)/); if (lm) id = 'list:' + lm[1];
-    toast('v' + APP_V + ' · modo ' + S.ytMode + ' · id ' + (id || 'nenhum') + (navigator.standalone ? ' · PWA' : ' · Safari'), false, 6000);
     if (S.ytMode !== 'app' && id) {
       playing = id; if (current !== 'yt') show('home');
       var html = embedHtml(id) +
@@ -855,7 +854,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 16;
+  var APP_V = 17;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
