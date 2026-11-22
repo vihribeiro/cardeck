@@ -219,9 +219,10 @@
       setView: function (lat, lon, z) { m.setView([lat, lon], z == null ? m.getZoom() : z, { animate: true }); },
       getZoom: function () { return m.getZoom(); },
       invalidate: function () { m.invalidateSize(); },
-      setMe: function (lat, lon) {
-        if (!me) me = L.marker([lat, lon], { icon: L.divIcon({ className: '', html: '<div class="car"></div>', iconSize: [22, 22] }), interactive: false }).addTo(m);
+      setMe: function (lat, lon, h) {
+        if (!me) me = L.marker([lat, lon], { icon: L.divIcon({ className: '', html: '<div class="car"></div>', iconSize: [30, 30] }), interactive: false }).addTo(m);
         else me.setLatLng([lat, lon]);
+        var c = me.getElement() && me.getElement().firstChild; if (c) c.style.transform = 'rotate(' + h + 'deg)';
       },
       setSel: function (lat, lon) { if (sel) m.removeLayer(sel); sel = L.marker([lat, lon]).addTo(m); },
       clearSel: function () { if (sel) { m.removeLayer(sel); sel = null; } },
@@ -275,9 +276,10 @@
       resetBearing: function () { m.easeTo({ bearing: 0, offset: [0, 0], duration: 600 }); },
       getZoom: function () { return m.getZoom(); },
       invalidate: function () { m.resize(); },
-      setMe: function (lat, lon) {
-        if (!me) { var el = document.createElement('div'); el.className = 'car'; me = new mapboxgl.Marker({ element: el }).setLngLat([lon, lat]).addTo(m); }
+      setMe: function (lat, lon, h) {
+        if (!me) { var el = document.createElement('div'); el.className = 'car'; me = new mapboxgl.Marker({ element: el, rotationAlignment: 'map', pitchAlignment: 'map' }).setLngLat([lon, lat]).addTo(m); }
         else me.setLngLat([lon, lat]);
+        me.setRotation(h);
       },
       setSel: function (lat, lon) { if (sel) sel.remove(); sel = new mapboxgl.Marker({ color: '#3b82f6' }).setLngLat([lon, lat]).addTo(m); },
       clearSel: function () { if (sel) { sel.remove(); sel = null; } },
@@ -319,7 +321,7 @@
   };
   function updateMe(prev) {
     if (!map || !loc) return;
-    map.setMe(loc.lat, loc.lon);
+    map.setMe(loc.lat, loc.lon, hdg);
     if (!meSet) { meSet = true; map.setView(loc.lat, loc.lon, 15); }
     else if (follow) map.setView(loc.lat, loc.lon, null, navBearing());
   }
@@ -857,7 +859,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 22;
+  var APP_V = 23;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
