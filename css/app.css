@@ -207,3 +207,9 @@ input.hue::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:
 #navPanel .btn{padding:8px 12px;font-size:14px;border-radius:12px}
 #navPanel #navEta{font-size:12px}
 .mapcard:not(.full) #navPanel{bottom:16px}
+
+/* durante a navegacao (v21): sem busca, destino ao lado do relogio */
+.hud-l{display:flex;align-items:center;gap:12px}
+.destchip{max-width:46vw;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:12px;border-left:2px solid var(--acc)}
+.mapcard:has(#navPanel:not(.hidden)) .map-search,.mapcard:has(#navPanel:not(.hidden)) .results.floating{display:none}
+.mapcard.full:has(#navPanel:not(.hidden)) .hud-l{display:flex}

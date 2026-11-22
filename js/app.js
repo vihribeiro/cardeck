@@ -444,6 +444,7 @@
       map.setRoute(pts); map.fit();
       $('#placePanel').classList.add('hidden'); $('#navPanel').classList.remove('hidden');
       $('#btnStartNav').classList.remove('hidden');
+      var dc = $('#destChip'); dc.textContent = sel.name || sel.sub || 'Destino'; dc.classList.remove('hidden');
       navRender();
     }).catch(function () { toast('Não foi possível traçar a rota.', true); })
       .then(function () { btn.textContent = 'Traçar rota'; });
@@ -458,7 +459,7 @@
   $('#btnEndNav').onclick = endNav;
   function endNav() {
     NAV = null; follow = false; map.clearRoute();
-    $('#navPanel').classList.add('hidden'); if (window.speechSynthesis) speechSynthesis.cancel();
+    $('#navPanel').classList.add('hidden'); $('#destChip').classList.add('hidden'); if (window.speechSynthesis) speechSynthesis.cancel();
   }
   function nearest(lat, lon) { // índice do ponto mais próximo da rota
     var best = 0, bd = 1e12, p = [lat, lon];
@@ -847,7 +848,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 20;
+  var APP_V = 21;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
