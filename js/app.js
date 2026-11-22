@@ -539,8 +539,16 @@
   }
   function playStation(s) {
     if (playingId === s.stationuuid) { audio.pause(); playingId = null; setNP(null); renderRadios(); return; }
-    playingId = s.stationuuid; audio.src = s.url_resolved; audio.play().catch(function () { toast('Não foi possível tocar esta rádio.', true); });
-    setNP(s); renderRadios();
+    playingId = s.stationuuid; setNP(s); renderRadios();
+    var urls = [s.url_resolved]; if (s.url && s.url !== s.url_resolved && /^https:/.test(s.url)) urls.push(s.url);
+    var tryN = function (i, why) {
+      if (playingId !== s.stationuuid) return;
+      if (i >= urls.length) { playingId = null; setNP(null); renderRadios(); toast('Não foi possível tocar esta rádio' + (why ? ' (' + why + ')' : '') + '.', true); return; }
+      audio.onerror = function () { audio.onerror = null; tryN(i + 1, 'erro ' + (audio.error ? audio.error.code : '?')); };
+      audio.pause(); audio.src = urls[i]; audio.load();
+      var p = audio.play(); if (p && p.catch) p.catch(function (e) { if (e && e.name === 'AbortError') return; audio.onerror = null; tryN(i + 1, e && e.name); });
+    };
+    tryN(0);
   }
   function setNP(s) {
     $('#homeNP').innerHTML = s ? '<b>' + esc(s.name.trim()) + '</b> <span class="muted">· ao vivo</span>' : 'Nada tocando';
