@@ -32,6 +32,7 @@
   var S = { topic: 'cardeck-' + rand(10), locMode: null, city: '', cityCoords: null, nav: 'waze', voice: true, mph: false,
     favs: [], contacts: [], ytRecent: [], ytMode: 'embed' };
   try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) for (var k in saved) S[k] = saved[k]; } catch (e) {}
+  if (S.ytMig !== 12) { S.ytMode = 'embed'; S.ytMig = 12; }  // versoes antigas gravavam 'app' (abre o YouTube)
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
 
