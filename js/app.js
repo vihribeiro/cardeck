@@ -559,10 +559,15 @@
     };
     tryN(0);
   }
+  var VU_N = 5;
+  $('#homeNP').addEventListener('click', function (e) {
+    var v = e.target.closest ? e.target.closest('.vu') : null; if (!v) return;
+    S.vuStyle = ((S.vuStyle | 0) + 1) % VU_N; v.dataset.s = S.vuStyle; save();
+  });
   function npHtml(s, live) {
     var bars = '', i; for (i = 0; i < 14; i++) bars += '<i style="animation-delay:-' + (Math.random() * 1.2).toFixed(2) + 's;animation-duration:' + (0.5 + Math.random() * 0.7).toFixed(2) + 's"></i>';
     var logo = s.favicon && /^https:/.test(s.favicon) ? '<img src="' + esc(s.favicon) + '" onerror="this.style.display=\'none\'">' : '';
-    return '<div class="np">' + logo + '<div class="npt"><b>' + esc(s.name.trim()) + '</b><span class="muted">' + (live ? 'ao vivo' : 'conectando…') + '</span></div><div class="vu' + (live ? ' on' : '') + '">' + bars + '</div></div>';
+    return '<div class="np">' + logo + '<div class="npt"><b>' + esc(s.name.trim()) + '</b><span class="muted">' + (live ? 'ao vivo' : 'conectando…') + '</span></div><div class="vu' + (live ? ' on' : '') + '" data-s="' + ((S.vuStyle | 0) % VU_N) + '">' + bars + '</div></div>';
   }
   function setNP(s) {
     $('#homeNP').innerHTML = s ? npHtml(s, false) : 'Nada tocando';

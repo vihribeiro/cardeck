@@ -152,3 +152,16 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 .vu i{width:5px;height:100%;border-radius:2px;background:linear-gradient(to top,var(--ok) 0 55%,#facc15 55% 80%,var(--bad) 80%);transform-origin:bottom;transform:scaleY(.08);opacity:.5}
 .vu.on i{opacity:1;animation:vu 0.8s ease-in-out infinite alternate}
 @keyframes vu{0%{transform:scaleY(.12)}100%{transform:scaleY(1)}}
+
+/* estilos de VU (toque para trocar) */
+.vu{cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent}
+.vu[data-s="1"] i{transform-origin:center;background:linear-gradient(to top,var(--acc),#7dd3fc);border-radius:3px}
+.vu[data-s="1"].on i{animation-name:vu}
+.vu[data-s="2"] i{width:7px;-webkit-mask-image:repeating-linear-gradient(to top,#000 0 4px,transparent 4px 6px);mask-image:repeating-linear-gradient(to top,#000 0 4px,transparent 4px 6px);border-radius:0}
+.vu[data-s="3"]{align-items:center}
+.vu[data-s="3"] i{width:8px;height:8px;border-radius:50%;transform:none;background:#a78bfa;opacity:.5}
+.vu[data-s="3"].on i{opacity:1;animation-name:vudot}
+.vu[data-s="4"]{align-items:center}
+.vu[data-s="4"] i{width:2px;transform-origin:center;border-radius:1px;background:linear-gradient(to top,#f472b6,#fb923c)}
+.vu[data-s="4"].on i{animation-name:vu}
+@keyframes vudot{0%{transform:translateY(12px) scale(.7)}100%{transform:translateY(-12px) scale(1.3)}}
