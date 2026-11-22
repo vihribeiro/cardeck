@@ -68,7 +68,10 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 .nav-main{display:flex;gap:16px;align-items:center}
 .nav-arrow{font-size:46px;width:64px;text-align:center}
 .nav-dist{font-size:34px;font-weight:700}.nav-text{font-size:18px;color:var(--mut)}
-.car{width:30px;height:30px;background:var(--acc);clip-path:polygon(50% 0,100% 100%,50% 76%,0 100%);filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 3px #fff)}
+.car{width:30px;height:30px;position:relative;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.car::before,.car::after{content:'';position:absolute;clip-path:polygon(50% 0,100% 100%,50% 76%,0 100%)}
+.car::before{inset:-3px -4px -4px;background:#fff}
+.car::after{inset:0;background:var(--acc)}
 .leaflet-container{background:#0b0d12}
 .tiles-dark{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.95) saturate(.7)}
 
@@ -176,7 +179,6 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 #dock button.on,#dock button.on span,#dock button.on .ic{color:var(--on)!important}
 .btn.primary,.chip.on,.mapctl button.on,.winctl .wl,.winctl .wx{color:var(--on)}
 .winctl .wx{color:#fff}
-.car{background:var(--acc)}
 .editing .winctl{background:color-mix(in srgb,var(--acc) 14%,transparent)}
 .swatches{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
 .sw{width:42px;height:42px;border-radius:50%;border:3px solid transparent;padding:0}
