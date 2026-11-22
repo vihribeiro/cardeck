@@ -680,7 +680,7 @@
   }
   function pdPlace(slot) { if (CUR && CUR.mode && CUR.slot !== slot) pdRender(slot); }
   function pdPlay(id, k, title, live) {
-    $('#ytPlayer').innerHTML = ''; playing = id; $('#pdStatus').textContent = 'Carregando vídeo…';
+    playing = id; $('#pdStatus').textContent = 'Carregando vídeo…';
     var me = CUR = { id: id, title: title, live: live, t: 0, slot: null, mode: null };
     var slot = current === 'home' ? 'home' : 'yt';
     var embed = function (why) {
@@ -794,7 +794,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 33;
+  var APP_V = 34;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
