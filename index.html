@@ -14,7 +14,7 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="leaflet/leaflet.css">
 <link rel="stylesheet" href="mapbox/mapbox-gl.css">
-<link rel="stylesheet" href="css/app.css?v=5">
+<link rel="stylesheet" href="css/app.css?v=6">
 </head>
 <body>
 <div id="app">
@@ -23,6 +23,7 @@
     <button data-view="map" aria-label="Mapa"><i class="ic" data-ic="compass"></i><span>Mapa</span></button>
     <button data-view="music" aria-label="Música"><i class="ic" data-ic="music"></i><span>Música</span></button>
     <button data-view="yt" aria-label="YouTube"><i class="ic" data-ic="youtube"></i><span>YouTube</span></button>
+    <button id="dockEdit" aria-label="Organizar"><i class="ic" data-ic="layout"></i><span>Organizar</span></button>
     <button data-view="settings" aria-label="Ajustes"><i class="ic" data-ic="sliders"></i><span>Ajustes</span></button>
   </nav>
 
@@ -30,7 +31,7 @@
     <!-- INÍCIO: mapa grande + música + YouTube -->
     <section id="v-home" class="view on">
       <div class="dash">
-        <div id="mapWrap" class="mapcard">
+        <div id="mapWrap" class="mapcard win">
           <div id="map"></div>
           <div class="hud hud-l">
             <div id="greet" class="greet"></div>
@@ -80,8 +81,7 @@
           </div>
         </div>
 
-        <div class="side">
-          <div class="card">
+        <div class="card win" id="winMusic">
             <h3>Música</h3>
             <div class="appgrid">
               <a href="spotify://"><i style="background:#1db954"><i class="ic" data-ic="music"></i></i>Spotify</a>
@@ -92,11 +92,11 @@
             <div id="homeNP" class="muted small" style="margin:10px 0 0">Nada tocando</div>
             <button id="goRadio" class="btn block"><i class="ic" data-ic="radio"></i> Rádios no iPad</button>
           </div>
-          <div class="card ytcard">
+          <div class="card ytcard win" id="winYt">
             <div class="row" style="margin:0 0 10px"><h3 style="margin:0;color:#ff4d4d;flex:1"><i class="ic" data-ic="youtube"></i> YouTube</h3><button id="goYt" class="btn"><i class="ic" data-ic="search"></i> Buscar</button></div>
             <div id="homeYt" class="homeyt"></div>
           </div>
-        </div>
+        <div id="winTray" class="wintray hidden"></div>
       </div>
     </section>
 
@@ -229,10 +229,10 @@
   </div>
 </div>
 
-<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v5</div>
+<div class="muted small" style="position:fixed;right:10px;bottom:4px;opacity:.5;z-index:1">v6</div>
 <audio id="audio" preload="none"></audio>
 <script src="leaflet/leaflet.js"></script>
 <script src="mapbox/mapbox-gl.js"></script>
-<script src="js/app.js?v=5"></script>
+<script src="js/app.js?v=6"></script>
 </body>
 </html>

@@ -7,6 +7,12 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var ICONS = {"home": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/>","compass": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z\"/>","music": "<path d=\"M9 18V5l12-2v13\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><circle cx=\"18\" cy=\"16\" r=\"3\"/>","youtube": "<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"4\"/><path d=\"m10 9 5 3-5 3z\" fill=\"currentColor\"/>","play": "<polygon points=\"6 3 20 12 6 21 6 3\" fill=\"currentColor\"/>","sliders": "<path d=\"M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4\"/>","globe": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"/><path d=\"M2 12h20\"/>","moon": "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>","traffic": "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"3\"/><circle cx=\"12\" cy=\"7\" r=\"1.3\"/><circle cx=\"12\" cy=\"12\" r=\"1.3\"/><circle cx=\"12\" cy=\"17\" r=\"1.3\"/>","building": "<rect x=\"4\" y=\"2\" width=\"16\" height=\"20\" rx=\"2\"/><path d=\"M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01\"/>","locate": "<path d=\"M2 12h3M19 12h3M12 2v3M12 19v3\"/><circle cx=\"12\" cy=\"12\" r=\"7\"/><circle cx=\"12\" cy=\"12\" r=\"2\" fill=\"currentColor\"/>","maximize": "<path d=\"M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3\"/>","minimize": "<path d=\"M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3\"/>","star": "<polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/>","star-fill": "<polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\" fill=\"currentColor\"/>","volume": "<polygon points=\"11 5 6 9 2 9 2 15 6 15 11 19 11 5\"/><path d=\"M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14\"/>","volume-x": "<polygon points=\"11 5 6 9 2 9 2 15 6 15 11 19 11 5\"/><path d=\"m22 9-6 6M16 9l6 6\"/>","radio": "<path d=\"M4.9 19.1C1 15.2 1 8.8 4.9 4.9M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5M19.1 4.9C23 8.8 23 15.1 19.1 19\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/>","search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>","pin": "<path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>","arrow-up": "<path d=\"m5 12 7-7 7 7M12 19V5\"/>","arrow-left": "<path d=\"m12 19-7-7 7-7M19 12H5\"/>","arrow-right": "<path d=\"M5 12h14m-7-7 7 7-7 7\"/>","up-left": "<path d=\"M17 17V7H7M17 7 7 17\"/>","up-right": "<path d=\"M7 7h10v10M7 17 17 7\"/>","corner-left": "<path d=\"M9 14 4 9l5-5\"/><path d=\"M20 20v-7a4 4 0 0 0-4-4H4\"/>","corner-right": "<path d=\"m15 14 5-5-5-5\"/><path d=\"M4 20v-7a4 4 0 0 1 4-4h12\"/>","uturn": "<path d=\"M9 14 4 9l5-5\"/><path d=\"M4 9h10.5a5.5 5.5 0 0 1 0 11H11\"/>","flag": "<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7\"/>","round": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5\"/>","alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4M12 17h.01\"/>","x": "<path d=\"M18 6 6 18M6 6l12 12\"/>","sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41\"/>","cloud": "<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\"/>","rain": "<path d=\"M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.2M16 14v6M8 14v6M12 16v6\"/>","storm": "<path d=\"M6 16.3A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.97M13 12l-3 5h4l-3 5\"/>","fog": "<path d=\"M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24M16 17H7M17 21H9\"/>","wifi-off": "<path d=\"m2 2 20 20M8.5 16.5a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 4.2-2.6M10.7 5.1A15 15 0 0 1 22 8.8M5 12.9a10 10 0 0 1 5.2-2.8M14 10.3a10 10 0 0 1 5 2.6M12 20h.01\"/>"};
   function ic(n) { return '<svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[n] || '') + '</svg>'; }
+  ICONS.layout = '<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>';
+  ICONS.plus = '<path d="M5 12h14"/><path d="M12 5v14"/>';
+  ICONS.check = '<path d="M20 6 9 17l-5-5"/>';
+  ICONS.x = '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>';
+  ICONS.reset = '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>';
+  ICONS.move = '<path d="M12 2v20"/><path d="m15 19-3 3-3-3"/><path d="m19 9 3 3-3 3"/><path d="M2 12h20"/><path d="m5 9-3 3 3 3"/><path d="m9 5 3-3 3 3"/>';
   function setIc(el, n) { if (el) { el.dataset.ic = n; el.innerHTML = ic(n); } }
   function hydrateIcons() { $$('.ic').forEach(function (el) { el.innerHTML = ic(el.dataset.ic); }); }
   hydrateIcons();
@@ -32,19 +38,87 @@
   /* ---------- navegação entre telas ---------- */
   var current = 'home';
   function show(v) {
+    if (editing && v !== 'home') setEdit(false);
+    if (v === 'map' && S.layout && !S.layout.map.on) { S.layout.map.on = true; applyLayout(); save(); }
     current = v;
     var vv = v === 'map' ? 'home' : v;
     $$('.view').forEach(function (el) { el.classList.toggle('on', el.id === 'v-' + vv); });
     $('#mapWrap').classList.toggle('full', v === 'map');
     setIc($('#btnExpand i'), v === 'map' ? 'minimize' : 'maximize');
-    $$('#dock button').forEach(function (b) { b.classList.toggle('on', b.dataset.view === v); });
+    $$('#dock button[data-view]').forEach(function (b) { b.classList.toggle('on', b.dataset.view === v); });
     if (v === 'home' || v === 'map') { initMap(); setTimeout(function () { map.invalidate(); }, 80); }
     if (v === 'home') renderHomeYt();
     if (v === 'music') loadRadios();
     if (v === 'yt') { renderYtRecent(); renderYtAccount(); if (gValid() && !$('#ytItems').children.length) ytLoadTab(); }
     if (v === 'settings') renderSettings();
   }
-  $$('#dock button').forEach(function (b) { b.onclick = function () { show(b.dataset.view); }; });
+  $$('#dock button[data-view]').forEach(function (b) { b.onclick = function () { show(b.dataset.view); }; });
+
+  /* ---------- janelas da home (mover / redimensionar / remover / adicionar) ---------- */
+  var WINS = {
+    map: { id: 'mapWrap', label: 'Mapa', def: { x: 0, y: 0, w: 0.63, h: 1 } },
+    music: { id: 'winMusic', label: 'Música', def: { x: 0.645, y: 0, w: 0.355, h: 0.42 } },
+    yt: { id: 'winYt', label: 'YouTube', def: { x: 0.645, y: 0.435, w: 0.355, h: 0.565 } }
+  };
+  var winZ = 10, editing = false;
+  function winDefault(k) { var d = WINS[k].def; return { x: d.x, y: d.y, w: d.w, h: d.h, on: true }; }
+  S.layout = S.layout || {};
+  Object.keys(WINS).forEach(function (k) { var l = S.layout[k]; if (!l || typeof l.x !== 'number') S.layout[k] = winDefault(k); });
+  function place(k) {
+    var l = S.layout[k], el = $('#' + WINS[k].id);
+    el.classList.toggle('win-off', !l.on);
+    el.style.left = (l.x * 100) + '%'; el.style.top = (l.y * 100) + '%';
+    el.style.width = (l.w * 100) + '%'; el.style.height = (l.h * 100) + '%';
+  }
+  function renderTray() {
+    var h = '';
+    Object.keys(WINS).forEach(function (k) { if (!S.layout[k].on) h += '<button class="btn" data-add="' + k + '">' + ic('plus') + ' ' + WINS[k].label + '</button>'; });
+    h += '<button class="btn" data-reset="1">' + ic('reset') + ' Padrão</button><button class="btn primary" data-done="1">' + ic('check') + ' Concluir</button>';
+    $('#winTray').innerHTML = h;
+  }
+  function applyLayout() { Object.keys(WINS).forEach(place); renderTray(); }
+  function setEdit(on) {
+    if (on && current !== 'home') show('home');
+    editing = on;
+    document.body.classList.toggle('editing', on);
+    $('#winTray').classList.toggle('hidden', !on);
+    $('#dockEdit').classList.toggle('on', on);
+    if (on) renderTray();
+  }
+  $('#dockEdit').onclick = function () { setEdit(!editing); };
+  $('#winTray').onclick = function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null; if (!b) return;
+    if (b.dataset.add) { var l = S.layout[b.dataset.add]; l.on = true; l.x = Math.min(l.x, 1 - l.w); l.y = Math.min(l.y, 1 - l.h); $('#' + WINS[b.dataset.add].id).style.zIndex = ++winZ; }
+    else if (b.dataset.reset) { Object.keys(WINS).forEach(function (k) { S.layout[k] = winDefault(k); }); }
+    else if (b.dataset.done) { setEdit(false); save(); return; }
+    applyLayout(); save();
+  };
+  Object.keys(WINS).forEach(function (k) {
+    var el = $('#' + WINS[k].id), c = document.createElement('div');
+    c.className = 'winctl';
+    c.innerHTML = '<span class="wl">' + ic('move') + ' ' + WINS[k].label + '</span><button class="wx" aria-label="Remover">' + ic('x') + '</button><div class="wrs"></div>';
+    el.appendChild(c);
+    c.querySelector('.wx').onclick = function (e) { e.stopPropagation(); S.layout[k].on = false; applyLayout(); save(); };
+    c.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('.wx')) return;
+      var rs = !!e.target.closest('.wrs'), l = S.layout[k], dr = $('.dash').getBoundingClientRect();
+      if (!dr.width || !dr.height) return;
+      var sx = e.clientX, sy = e.clientY, o = { x: l.x, y: l.y, w: l.w, h: l.h };
+      el.style.zIndex = ++winZ;
+      try { c.setPointerCapture(e.pointerId); } catch (x) {}
+      e.preventDefault();
+      function mv(ev) {
+        var dx = (ev.clientX - sx) / dr.width, dy = (ev.clientY - sy) / dr.height;
+        if (rs) { l.w = Math.min(1 - o.x, Math.max(0.18, o.w + dx)); l.h = Math.min(1 - o.y, Math.max(0.15, o.h + dy)); }
+        else { l.x = Math.min(1 - o.w, Math.max(0, o.x + dx)); l.y = Math.min(1 - o.h, Math.max(0, o.y + dy)); }
+        place(k);
+      }
+      function up() { c.removeEventListener('pointermove', mv); c.removeEventListener('pointerup', up); c.removeEventListener('pointercancel', up); save(); }
+      c.addEventListener('pointermove', mv); c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+    });
+  });
+  applyLayout();
+  if (window.ResizeObserver) new ResizeObserver(function () { if (map) map.invalidate(); }).observe($('#mapWrap'));
 
   /* ---------- relógio, clima, rede ---------- */
   var DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
