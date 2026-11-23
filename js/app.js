@@ -18,6 +18,9 @@
   hydrateIcons();
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
   function rand(n) { var a = 'abcdefghijkmnpqrstuvwxyz23456789', o = ''; for (var i = 0; i < n; i++) o += a[Math.floor(Math.random() * a.length)]; return o; }
+  /* token publico do Mapbox (pk.): usado so como reserva de busca/rotas quando os servicos padrao falham (iOS antigo) */
+  var MB_PUB = 'pk.eyJ1IjoidmluaWNpdXMtc2FudG9zLXJpYmVpcm8iLCJhIjoiY213cjYzenNvMGliaDJ6cHp5bnVweHpqciJ9.xvo1EYENegsF38zMNvYFvg';
+  function mbKey() { return S.mbToken || MB_PUB; }
   function getJSON(url, opts) {
     return fetch(url, opts).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
   }
@@ -347,8 +350,7 @@
     var u = 'https://photon.komoot.io/api/?limit=6&lang=default&q=' + encodeURIComponent(q);
     if (loc) u += '&lat=' + loc.lat + '&lon=' + loc.lon;
     getJSON(u).catch(function () {
-      if (!S.mbToken) throw new Error('nomb');
-      var mu = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q) + '.json?limit=6&language=pt&access_token=' + encodeURIComponent(S.mbToken);
+      var mu = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q) + '.json?limit=6&language=pt&access_token=' + encodeURIComponent(mbKey());
       if (loc) mu += '&proximity=' + loc.lon + ',' + loc.lat;
       return getJSON(mu).then(function (m) {
         return { features: (m.features || []).map(function (f) {
@@ -369,7 +371,7 @@
         el.onclick = function () { box.innerHTML = ''; show('map'); selectPlace({ lat: c[1], lon: c[0], name: name, sub: sub }, true); };
         box.appendChild(el);
       });
-    }).catch(function (e) { box.innerHTML = '<div class="muted">' + (e && e.message === 'nomb' ? 'Falha na busca. Se este aparelho for antigo (iOS 9/10), cole o token do Mapbox em Ajustes: a busca passa a funcionar por ele.' : 'Falha na busca. Verifique a internet.') + '</div>'; });
+    }).catch(function (e) { box.innerHTML = '<div class="muted">' + 'Falha na busca. Verifique a internet.' + '</div>'; });
   }
   $('#mapGo').onclick = function () { search($('#mapQ').value, $('#mapResults')); };
   $('#mapQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#mapGo').click(); });
@@ -440,8 +442,7 @@
     return getJSON('https://router.project-osrm.org/route/v1/driving/' + path + q)
       .catch(function () { return getJSON('https://routing.openstreetmap.de/routed-car/route/v1/driving/' + path + q); })
       .catch(function (e) {
-        if (!S.mbToken) throw e;
-        return getJSON('https://api.mapbox.com/directions/v5/mapbox/driving/' + path + q + '&language=pt&access_token=' + encodeURIComponent(S.mbToken));
+        return getJSON('https://api.mapbox.com/directions/v5/mapbox/driving/' + path + q + '&language=pt&access_token=' + encodeURIComponent(mbKey()));
       })
       .then(function (j) { if (!j || j.code !== 'Ok' || !j.routes.length) throw new Error('route'); return j.routes[0]; });
   }
@@ -808,7 +809,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 36;
+  var APP_V = 37;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
