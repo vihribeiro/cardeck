@@ -203,6 +203,15 @@
   function stopGps() { if (watchId != null) { navigator.geolocation.clearWatch(watchId); watchId = null; } }
   function subscribe() {
     if (es) { es.close(); es = null; }
+    if (window.CD_VPS) { /* modo VPS: consulta a posicao no servidor a cada 3 s */
+      var lastT = 0, id = setInterval(function () {
+        fetch(window.CD_VPS.base + '/loc').then(function (r) { return r.json(); }).then(function (j) {
+          if (j && j.t && j.t !== lastT && Date.now() - j.t < 600000) { lastT = j.t; setLoc(j.lat, j.lon, 'iphone'); }
+        }).catch(function () {});
+      }, 3000);
+      es = { close: function () { clearInterval(id); } };
+      return;
+    }
     if (!window.EventSource) return;
     es = new EventSource('https://ntfy.sh/' + encodeURIComponent(S.topic + '-ipad') + '/sse?since=2m');
     es.onmessage = function (ev) {
@@ -809,7 +818,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 37;
+  var APP_V = 38;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];

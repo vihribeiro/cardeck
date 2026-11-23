@@ -1,0 +1,24 @@
+services:
+  cardeck:
+    image: node:22-alpine
+    container_name: cardeck
+    working_dir: /srv
+    command: ["node", "server.js"]
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      TOKEN: ${TOKEN}
+      PORT: "8088"
+      APP_DIR: /app
+    volumes:
+      - ./server.js:/srv/server.js:ro
+      - ./app:/app:ro
+    read_only: true
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
