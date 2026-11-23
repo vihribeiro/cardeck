@@ -346,7 +346,17 @@
     box.innerHTML = '<div class="muted">Buscando…</div>';
     var u = 'https://photon.komoot.io/api/?limit=6&lang=default&q=' + encodeURIComponent(q);
     if (loc) u += '&lat=' + loc.lat + '&lon=' + loc.lon;
-    getJSON(u).then(function (j) {
+    getJSON(u).catch(function () {
+      if (!S.mbToken) throw new Error('nomb');
+      var mu = 'https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(q) + '.json?limit=6&language=pt&access_token=' + encodeURIComponent(S.mbToken);
+      if (loc) mu += '&proximity=' + loc.lon + ',' + loc.lat;
+      return getJSON(mu).then(function (m) {
+        return { features: (m.features || []).map(function (f) {
+          var pn = String(f.place_name || ''), t = f.text || pn;
+          return { properties: { name: t, district: pn.indexOf(t + ', ') === 0 ? pn.slice(t.length + 2) : '' }, geometry: { coordinates: f.center } };
+        }) };
+      });
+    }).then(function (j) {
       var fs = j.features || [];
       if (!fs.length) { box.innerHTML = '<div class="muted">Nada encontrado.</div>'; return; }
       box.innerHTML = '';
@@ -359,7 +369,7 @@
         el.onclick = function () { box.innerHTML = ''; show('map'); selectPlace({ lat: c[1], lon: c[0], name: name, sub: sub }, true); };
         box.appendChild(el);
       });
-    }).catch(function () { box.innerHTML = '<div class="muted">Falha na busca. Verifique a internet.</div>'; });
+    }).catch(function (e) { box.innerHTML = '<div class="muted">' + (e && e.message === 'nomb' ? 'Falha na busca. Se este aparelho for antigo (iOS 9/10), cole o token do Mapbox em Ajustes: a busca passa a funcionar por ele.' : 'Falha na busca. Verifique a internet.') + '</div>'; });
   }
   $('#mapGo').onclick = function () { search($('#mapQ').value, $('#mapResults')); };
   $('#mapQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#mapGo').click(); });
@@ -429,6 +439,10 @@
     var q = '?overview=full&geometries=polyline&steps=true&alternatives=false';
     return getJSON('https://router.project-osrm.org/route/v1/driving/' + path + q)
       .catch(function () { return getJSON('https://routing.openstreetmap.de/routed-car/route/v1/driving/' + path + q); })
+      .catch(function (e) {
+        if (!S.mbToken) throw e;
+        return getJSON('https://api.mapbox.com/directions/v5/mapbox/driving/' + path + q + '&language=pt&access_token=' + encodeURIComponent(S.mbToken));
+      })
       .then(function (j) { if (!j || j.code !== 'Ok' || !j.routes.length) throw new Error('route'); return j.routes[0]; });
   }
   var ARROWS = { 'turn-left': ic('arrow-left'), 'turn-right': ic('arrow-right'), 'sharp left': ic('corner-left'), 'sharp right': ic('corner-right'), 'slight left': ic('up-left'), 'slight right': ic('up-right'), straight: ic('arrow-up'), uturn: ic('uturn'), arrive: ic('flag'), depart: ic('arrow-up') };
@@ -794,7 +808,7 @@
   applyTheme(); renderThemeUi();
 
   /* ---------- atualização do app ---------- */
-  var APP_V = 35;
+  var APP_V = 36;
   function hardReload() {
     var done = function () { location.replace(location.pathname + '?r=' + Date.now()); };
     var p = [];
