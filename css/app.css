@@ -16,7 +16,7 @@ input,select{-webkit-user-select:text;user-select:text}
 #dock button span{font-size:11px;color:var(--mut)}
 #dock button.on{background:var(--acc)} #dock button.on span{color:#fff}
 main{flex:1;position:relative;min-width:0}
-.view{display:none;position:absolute;inset:0;overflow:auto;padding:22px 26px;-webkit-overflow-scrolling:touch}
+.view{display:none;position:absolute;top:0;right:0;bottom:0;left:0;overflow:auto;padding:22px 26px;-webkit-overflow-scrolling:touch}
 .view.on{display:block}
 #v-home{padding:16px;overflow:hidden}
 h2{margin:0 0 14px;font-size:28px} h3{margin:22px 0 10px;font-size:16px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
@@ -58,7 +58,7 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 .item .t span{color:var(--mut);font-size:13px}
 .item.playing{border-color:var(--acc)}
 
-#map{position:absolute;inset:0;background:#0b0d12;border-radius:inherit}
+#map{position:absolute;top:0;right:0;bottom:0;left:0;background:#0b0d12;border-radius:inherit}
 .map-search{position:absolute;z-index:1000;top:136px;left:16px;right:16px;max-width:520px;display:flex;gap:8px}
 .map-search input{flex:1}
 .fab{position:absolute;z-index:1000;right:16px;top:14px;width:52px;height:52px;border-radius:26px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:24px}
@@ -75,16 +75,16 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 .leaflet-container{background:#0b0d12}
 .tiles-dark{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.95) saturate(.7)}
 
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:#000c;border:1px solid var(--line);
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:rgba(0,0,0,.8);border:1px solid var(--line);
   padding:12px 20px;border-radius:14px;z-index:5000;max-width:80%}
 .toast.err{border-color:var(--bad)}
-.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:6000;padding:20px}
+.modal{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.73);display:flex;align-items:center;justify-content:center;z-index:6000;padding:20px}
 .modal-card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;max-width:460px;width:100%}
 @media (max-width:700px){:root{--dock:64px}.clock{font-size:44px}#dock button span{display:none}}
 
 .dash{position:relative;height:100%}
 .mapcard{position:relative;border-radius:26px;overflow:hidden;border:1px solid var(--line);isolation:isolate}
-.mapcard.full{position:fixed!important;inset:0!important;left:var(--dock)!important;width:auto!important;height:auto!important;z-index:900!important;border-radius:0}
+.mapcard.full{position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;left:var(--dock)!important;width:auto!important;height:auto!important;z-index:900!important;border-radius:0}
 .hud{position:absolute;z-index:1000;pointer-events:none}
 .hud-l{top:12px;left:12px;background:rgba(15,18,24,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:18px;padding:8px 16px}
 .hud-l .greet{font-size:14px}.hud-l .clock{font-size:44px}.hud-l .muted{font-size:13px}
@@ -107,9 +107,9 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 .homeyt .playbtn{position:absolute;left:50%;top:calc(50% - 20px);transform:translate(-50%,-50%);width:64px;height:44px;border-radius:14px;background:#e00;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;pointer-events:none}
 .yt-ph{aspect-ratio:16/9;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:40px;color:#e00}
 
-.player{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000}
-.player video{position:absolute;inset:0;width:100%;height:100%;background:#000}
-.player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.player{position:relative;height:0;padding-top:56.25%;border-radius:14px;overflow:hidden;background:#000}
+.player video{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;background:#000}
+.player iframe{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;border:0}
 
 .mapctl{position:absolute;z-index:1000;right:12px;top:150px;display:flex;flex-direction:column;gap:8px}
 .mapctl button{width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:rgba(22,26,34,.92);color:var(--txt);font-size:22px}
@@ -142,7 +142,7 @@ input,select{background:var(--card2);color:var(--txt);border:1px solid var(--lin
 .win-off{display:none!important}
 .winctl{display:none}
 .editing .win{overflow:hidden!important}
-.editing .winctl{display:block;position:absolute;inset:0;z-index:2000;background:rgba(59,130,246,.14);border:2px dashed var(--acc);border-radius:inherit;cursor:move;touch-action:none}
+.editing .winctl{display:block;position:absolute;top:0;right:0;bottom:0;left:0;z-index:2000;background:rgba(59,130,246,.14);border:2px dashed var(--acc);border-radius:inherit;cursor:move;touch-action:none}
 .mapcard.full .winctl{display:none!important}
 .winctl .wl{position:absolute;left:12px;top:10px;background:var(--acc);color:#fff;border-radius:999px;padding:6px 14px;font-size:15px;display:flex;gap:6px;align-items:center}
 .winctl .wx{position:absolute;right:10px;top:10px;width:44px;height:44px;border-radius:22px;border:0;background:var(--bad);color:#fff;display:flex;align-items:center;justify-content:center;padding:0}
@@ -220,3 +220,11 @@ input.hue::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:
 
 /* folga no topo (barra/janela do iPad) */
 .mapcard.full{top:max(env(safe-area-inset-top),22px)!important}
+
+/* fallbacks para Safari antigo (iOS 9/10) */
+@supports not (aspect-ratio:1/1){.homeyt img{height:190px}.yt-ph{height:190px}}
+@supports not (display:grid){
+  .tiles,.appgrid{display:flex;flex-wrap:wrap}
+  .tiles>*{width:calc(25% - 10px);margin:5px}
+  .appgrid>*{width:calc(25% - 8px);margin:4px}
+}
