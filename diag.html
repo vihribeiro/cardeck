@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarDeck diagnóstico</title>
+<style>body{font:16px/1.5 -apple-system,Helvetica,sans-serif;background:#111;color:#eee;padding:16px}
+.r{padding:8px 10px;margin:6px 0;border-radius:8px;background:#222;word-break:break-all}
+.ok{border-left:6px solid #2ecc71}.bad{border-left:6px solid #e74c3c}.wait{border-left:6px solid #888}
+small{color:#aaa}button{font-size:18px;padding:10px 16px}</style></head>
+<body>
+<h2>Diagnóstico de rede</h2>
+<p><small>Abra esta página no iPad antigo e tire uma foto da tela. Cada linha mostra se o aparelho consegue falar com o serviço.</small></p>
+<button onclick="run()">Testar de novo</button>
+<div id="out"></div>
+<script>
+var T = [
+ ['Busca de endereço (Photon)', 'https://photon.komoot.io/api/?limit=1&q=paulista'],
+ ['Busca de endereço (Nominatim)', 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=paulista'],
+ ['Cidade/clima (Open-Meteo geocoding)', 'https://geocoding-api.open-meteo.com/v1/search?count=1&name=sao+paulo'],
+ ['Clima (Open-Meteo)', 'https://api.open-meteo.com/v1/forecast?latitude=-23.5&longitude=-46.6&current_weather=true'],
+ ['Rotas (OSRM)', 'https://router.project-osrm.org/route/v1/driving/-46.6,-23.5;-46.7,-23.6?overview=false'],
+ ['Rotas (routing.openstreetmap.de)', 'https://routing.openstreetmap.de/routed-car/route/v1/driving/-46.6,-23.5;-46.7,-23.6?overview=false'],
+ ['Rádios (radio-browser)', 'https://de1.api.radio-browser.info/json/stations/search?limit=1&name=cbn'],
+ ['YouTube busca (piped.private.coffee)', 'https://api.piped.private.coffee/search?q=musica&filter=videos'],
+ ['YouTube busca (kavin.rocks)', 'https://pipedapi.kavin.rocks/search?q=musica&filter=videos'],
+ ['Miniaturas YouTube (ytimg)', 'https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg'],
+ ['Tiles do mapa (OSM)', 'https://tile.openstreetmap.org/0/0/0.png'],
+ ['Este site (GitHub Pages)', 'index.html?_=' + new Date().getTime()]
+];
+function line(t) { var d = document.createElement('div'); d.className = 'r wait'; d.innerHTML = '<b>' + t + '</b><br><small>testando…</small>'; document.getElementById('out').appendChild(d); return d; }
+function done(d, ok, msg) { d.className = 'r ' + (ok ? 'ok' : 'bad'); d.getElementsByTagName('small')[0].textContent = msg; }
+function one(t) {
+  var d = line(t[0]), x = new XMLHttpRequest(), t0 = new Date().getTime();
+  x.open('GET', t[1], true); x.timeout = 12000;
+  x.onload = function () { done(d, x.status >= 200 && x.status < 300, (x.status >= 200 && x.status < 300 ? 'OK' : 'Respondeu, mas com erro') + ' · status ' + x.status + ' · ' + (new Date().getTime() - t0) + ' ms'); };
+  x.onerror = function () { done(d, false, 'FALHOU · status ' + x.status + ' (0 = bloqueado por certificado/segurança/CORS ou sem rede) · ' + (new Date().getTime() - t0) + ' ms'); };
+  x.ontimeout = function () { done(d, false, 'FALHOU · demorou demais (12 s)'); };
+  try { x.send(); } catch (e) { done(d, false, 'FALHOU · ' + e); }
+}
+function run() {
+  document.getElementById('out').innerHTML = '';
+  var l = document.createElement('div'); l.className = 'r wait';
+  l.innerHTML = '<b>Aparelho</b><br><small>' + navigator.userAgent + '<br>fetch: ' + (window.fetch ? 'sim' : 'não') + ' · WebGL: ' + (function () { try { var c = document.createElement('canvas'); return !!(c.getContext('webgl') || c.getContext('experimental-webgl')); } catch (e) { return false; } })() + '</small>';
+  document.getElementById('out').appendChild(l);
+  for (var i = 0; i < T.length; i++) one(T[i]);
+}
+run();
+</script></body></html>
